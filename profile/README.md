@@ -8,7 +8,7 @@ Deploy sites, APIs, and AI agents to distributed compute networks like IPFS, Arw
 
 [![Website](https://img.shields.io/badge/Website-alternatefutures.ai-0026FF?style=for-the-badge)](https://alternatefutures.ai)
 [![Docs](https://img.shields.io/badge/Docs-docs.alternatefutures.ai-0026FF?style=for-the-badge)](https://docs.alternatefutures.ai)
-[![Discord](https://img.shields.io/badge/Discord-Join%20Us-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/alternatefutures)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-5865F2?style=for-the-badge&logo=discord&logoColor=white)]([https://discord.gg/alternatefutures](https://discord.gg/GwHw3aBK)
 
 ---
 
