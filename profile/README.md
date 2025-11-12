@@ -83,7 +83,7 @@ Our repositories are organized by type for easy discovery:
 Backend services and APIs that power the platform.
 
 - **[service-auth](https://github.com/alternatefutures/service-auth)** - Multi-method authentication (Email, SMS, Web3, OAuth)
-- **[service-cloud-api](https://github.com/alternatefutures/service-cloud-api)** - GraphQL API backend with Prisma + PostgreSQL
+- **[service-cloud-api](https://github.com/alternatefutures/service-cloud-api)** - GraphQL API backend with Prisma + YugibyteDB
 
 ### 📦 Packages
 Published npm packages for developers.
