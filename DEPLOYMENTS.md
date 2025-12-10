@@ -16,9 +16,9 @@ This file tracks active deployments on Akash Network. All information here is pu
 ### service-auth (Authentication)
 | Field | Value |
 |-------|-------|
-| **dseq** | 24363650 |
+| **dseq** | 24562739 |
 | **Provider** | Europlots |
-| **Ingress URL** | `uilm2birnle5b7ffcqvsgpolc4.ingress.europlots.com` |
+| **Ingress URL** | `ubsm31q4ol97b1pi5l06iognug.ingress.europlots.com` |
 | **Custom Domain** | auth.alternatefutures.ai |
 | **Status** | Running |
 
@@ -42,14 +42,15 @@ This file tracks active deployments on Akash Network. All information here is pu
 |---------|--------|-----|--------|
 | GraphQL API | api.alternatefutures.ai | Provider cert | Active |
 | Auth Service | auth.alternatefutures.ai | Provider cert | Active |
-| Secrets Manager | secrets.alternatefutures.ai | Pending | Active |
-| SSL Gateway | - | Let's Encrypt | Pending |
+| Secrets Manager | secrets.alternatefutures.ai | Provider cert | Active |
 
-## Pending Work
+## DNS Configuration
 
-- [ ] Deploy Caddy SSL gateway for Let's Encrypt certificates
-- [ ] Configure DNS for secrets.alternatefutures.ai
-- [ ] Enable proper SSL for custom domains
+| Domain | Record Type | Value |
+|--------|-------------|-------|
+| api.alternatefutures.ai | A | 170.75.255.101 |
+| auth.alternatefutures.ai | A | 86.33.22.194 |
+| secrets.alternatefutures.ai | A | 170.75.255.101 |
 
 ## Provider Reference
 
@@ -67,4 +68,4 @@ https://deploy.cloudmos.io/deployment/akash1degudmhf24auhfnqtn99mkja3xt7clt9um77
 
 ---
 
-*Last updated: 2025-11-26*
+*Last updated: 2025-12-09*
