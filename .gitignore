@@ -1,0 +1,18 @@
+# Local secrets - NEVER commit
+.secrets/
+*.local
+.env
+.env.*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local agent configuration
+.claude/local/
