@@ -152,7 +152,7 @@ Configured MCP servers (see `.claude/README.md`):
 
 | Service | DSEQ | Provider | IP/Ingress |
 |---------|------|----------|-----------|
-| **SSL Proxy** | 24673191 | DigitalFrontier | 77.76.13.214 (dedicated IP) |
+| **SSL Proxy** | 24758214 | leet.haus | 170.75.255.101 (dedicated IP) |
 | **Secrets (Infisical)** | 24672527 | Europlots | ddchr1pel5e0p8i0c46drjpclg.ingress.europlots.com |
 
 ### Traffic Routing Architecture
@@ -163,10 +163,10 @@ Configured MCP servers (see `.claude/README.md`):
     ┌──────────────┴──────────────┐
     │                             │
     ▼                             ▼
-┌─────────────┐           ┌─────────────────┐
-│ SSL Proxy   │           │ Secrets Service │
-│ 77.76.13.214│           │ (Direct/Isolated│
-└──────┬──────┘           └────────┬────────┘
+┌───────────────┐           ┌─────────────────┐
+│ SSL Proxy     │           │ Secrets Service │
+│ 170.75.255.101│           │ (Direct/Isolated│
+└───────┬───────┘           └────────┬────────┘
        │                           │
        ├── auth.alternatefutures.ai     secrets.alternatefutures.ai
        ├── api.alternatefutures.ai      (Cloudflare Transform Rule)
