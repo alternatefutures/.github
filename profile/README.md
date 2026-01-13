@@ -182,6 +182,7 @@ Perfect for NFT galleries, DAOs, DeFi dashboards with native wallet integration.
 
 **For Contributors:**
 - Check our [open issues](https://github.com/search?q=org%3Aalternatefutures+is%3Aissue+is%3Aopen&type=issues)
+- Read the [contributing guide](CONTRIBUTING.md) in this repo which setup rules for all repos
 - Read the contributing guides in each repo
 - Join our [Discord](https://discord.gg/alternatefutures)
 
