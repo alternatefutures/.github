@@ -107,7 +107,7 @@ graph TB
 
 | Component | Technology | Repository | Description |
 |-----------|-----------|------------|-------------|
-| Web Dashboard | SvelteKit 2 + Svelte 5 | `web-app.alternatefutures.ai` | Main user interface |
+| Web Dashboard | Next.js 16 + React 19 | `web-app.alternatefutures.ai` | Main user interface |
 | CLI | Node.js (Commander.js) | `package-cloud-cli` | Command-line tool (`af`) |
 | SDK | TypeScript | `package-cloud-sdk` | JavaScript SDK for programmatic access |
 | Docker Client | OCI Compatible | - | Standard Docker client for registry |
@@ -399,10 +399,16 @@ See [Functions Documentation](https://github.com/alternatefutures/web-docs.alter
 **Repository**: `alternatefutures/web-app.alternatefutures.ai`
 
 **Technology**:
-- SvelteKit 2.0
-- Svelte 5 (runes-based reactivity)
-- SMUI (Svelte Material UI)
-- Monaco Editor (code editing)
+- Next.js 16.0 (with Turbopack)
+- React 19.1
+- Radix UI (component library)
+- Tailwind CSS 4
+- TypeScript 5
+- next-intl (internationalization)
+- next-themes (theming support)
+- Lucide React (icons)
+- @xyflow/react (flow diagrams)
+- react-tracked (state management)
 
 **Features**:
 - Project management
@@ -412,6 +418,9 @@ See [Functions Documentation](https://github.com/alternatefutures/web-docs.alter
 - API key management
 - Billing dashboard
 - Real-time deployment logs
+- Multi-language support
+- Dark/light theme support
+- Visual workflow editor
 
 **URL**: `https://app.alternatefutures.ai`
 
@@ -661,12 +670,16 @@ sequenceDiagram
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| Framework | SvelteKit 2 | Web framework |
-| UI Library | Svelte 5 | Reactive UI |
-| Component Library | SMUI | Material UI components |
-| Editor | Monaco Editor | Code editing |
-| State Management | Svelte Stores | Client-side state |
-| Build Tool | Vite | Build tooling |
+| Framework | Next.js 16 | React framework with App Router |
+| UI Library | React 19 | UI rendering |
+| Component Library | Radix UI | Accessible component primitives |
+| Styling | Tailwind CSS 4 | Utility-first CSS framework |
+| Icons | Lucide React | Icon library |
+| Flow Diagrams | @xyflow/react | Interactive node-based diagrams |
+| State Management | react-tracked | State management |
+| Internationalization | next-intl | i18n support |
+| Theming | next-themes | Dark/light mode support |
+| Build Tool | Turbopack | Next.js bundler |
 
 ### Storage
 
@@ -695,7 +708,7 @@ sequenceDiagram
 | CLI | Commander.js | Command-line interface |
 | SDK | TypeScript | Programmatic API access |
 | Linter (Backend) | Biome | Code linting/formatting |
-| Linter (Frontend) | ESLint + Prettier | Code linting/formatting |
+| Linter (Frontend) | ESLint | Code linting/formatting |
 | Package Manager | pnpm | Monorepo package management |
 
 ---
@@ -714,7 +727,7 @@ sequenceDiagram
 
 | Repository | Type | Technology | Purpose |
 |-----------|------|-----------|---------|
-| `web-app.alternatefutures.ai` | Web App | SvelteKit 2 | User dashboard |
+| `web-app.alternatefutures.ai` | Web App | Next.js 16 + React 19 | User dashboard |
 | `web-docs.alternatefutures.ai` | Documentation | VitePress | Documentation site |
 | `web-alternatefutures.ai` | Website | Astro | Company website |
 
@@ -762,7 +775,7 @@ sequenceDiagram
 
 | Repository | Type | Status |
 |-----------|------|--------|
-| `archived-web-app.alternatefutures.ai` | Web App | Archived (old dashboard) |
+| `archived-web-app.alternatefutures.ai` | Web App | Archived (former SvelteKit version) |
 
 ---
 
@@ -1225,5 +1238,5 @@ graph LR
 ---
 
 **Last Updated**: 2026-01-21  
-**Version**: 2.1.0  
+**Version**: 2.2.0  
 **Maintainers**: Alternate Futures Team
