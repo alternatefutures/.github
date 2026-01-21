@@ -137,7 +137,7 @@ graph LR
 | Service | Purpose | Technology | Repository |
 |---------|---------|-----------|------------|
 | Sites/Apps | Static site & app hosting | IPFS/Arweave/Filecoin | `service-cloud-api` |
-| Functions | Serverless function execution | Runtime containers | `service-cloud-api` |
+| Functions | Serverless edge functions with Node.js runtime, Web APIs, SGX support | Runtime containers + IPFS | `service-cloud-api` |
 | Agents | AI agent deployment | Container orchestration | `service-cloud-api` |
 | Storage | Decentralized file storage | IPFS/Arweave/Filecoin | `service-cloud-api` |
 | Billing | Payment processing | Stripe | `service-cloud-api` |
@@ -271,7 +271,72 @@ graph TB
 
 See [Registry Architecture Documentation](https://github.com/alternatefutures/web-docs.alternatefutures.ai/blob/main/docs/guides/registry-architecture.md) for detailed information.
 
-### 4. Secrets Management (`service-secrets`)
+### 4. Functions Service (Cloud Functions)
+
+**Repository**: `alternatefutures/service-cloud-api`
+
+**Technology Stack**:
+- Node.js-compatible runtime
+- IPFS (code storage)
+- RuntimeRouter (request handling & routing)
+- Optional SGX (Software Guard Extensions)
+
+**Capabilities**:
+- **Serverless Edge Execution**: Functions run on the edge, close to users
+- **Web Standard APIs**: Full support for `fetch`, `Request`, `Response`, and other Web APIs
+- **Node.js Compatibility**: Node.js-compatible runtime environment
+- **Route Configuration**: Flexible route patterns (`/api/*`, `/users/:id`, etc.)
+- **Automatic Scaling**: Scales based on demand
+- **SGX Support**: Optional encrypted execution for confidential computing
+- **IPFS Code Storage**: Function code stored and retrieved from IPFS via CID
+- **Custom Domains**: Mount functions on custom domains or use default URLs
+
+**Function Runtime Features**:
+- API endpoints creation without managing servers
+- Dynamic content generation
+- Data processing and transformation
+- Webhook handling
+- Form processing
+- Authentication middleware
+- Image processing
+- Cross-origin request support (CORS)
+
+**URLs**:
+- Default: `https://<function-slug>.af-functions.app`
+- Custom domains supported
+
+**Management**:
+- CLI: `af functions create`, `af functions deploy`
+- SDK: Full programmatic API via `@alternatefutures/sdk`
+- Web Dashboard: Visual function management
+
+**Architecture**:
+
+```mermaid
+graph TB
+    subgraph "Function Runtime"
+        Request[Incoming Request] --> Router[RuntimeRouter]
+        Router -->|Route Match| Proxy[Proxy to Backend]
+        Router -->|No Match| Executor[Function Executor]
+        
+        Executor --> IPFS[(IPFS<br/>Fetch Code by CID)]
+        IPFS --> Runtime[Sandboxed Runtime<br/>Node.js + Web APIs]
+        Runtime -->|Optional| SGX[SGX Enclave<br/>Encrypted Execution]
+        
+        Runtime --> Response[Response]
+        Proxy --> Response
+        SGX --> Response
+    end
+```
+
+**Security**:
+- Environment variable support for secrets
+- SGX for encrypted execution and attestation
+- Code integrity verification via BLAKE3 hash
+
+See [Functions Documentation](https://github.com/alternatefutures/web-docs.alternatefutures.ai/blob/main/docs/guides/functions.md) for detailed usage guide.
+
+### 5. Secrets Management (`service-secrets`)
 
 **Repository**: `alternatefutures/service-secrets`
 
@@ -284,7 +349,7 @@ See [Registry Architecture Documentation](https://github.com/alternatefutures/we
 **Endpoints**:
 - `https://secrets.alternatefutures.ai`
 
-### 5. Proxy Service (`infrastructure-proxy`)
+### 6. Proxy Service (`infrastructure-proxy`)
 
 **Repository**: `alternatefutures/infrastructure-proxy`
 
@@ -309,7 +374,7 @@ See [Registry Architecture Documentation](https://github.com/alternatefutures/we
 - alternatefutures.ai → Company Website
 - registry.alternatefutures.ai → Container Registry
 
-### 6. DNS Management (`infrastructure-dns`)
+### 7. DNS Management (`infrastructure-dns`)
 
 **Repository**: `alternatefutures/infrastructure-dns`
 
@@ -1099,11 +1164,11 @@ graph LR
    - Webhook notifications
 
 2. **Platform**:
-   - Edge functions (Cloudflare Workers-like)
    - Real-time collaboration
    - AI agent marketplace
    - Template marketplace
    - Custom domain SSL automation
+   - Enhanced function analytics and monitoring
 
 3. **Infrastructure**:
    - Multi-cloud support (beyond Akash)
@@ -1117,6 +1182,7 @@ graph LR
 
 ### Documentation
 
+- [Functions Documentation](https://github.com/alternatefutures/web-docs.alternatefutures.ai/blob/main/docs/guides/functions.md)
 - [Registry Architecture](https://github.com/alternatefutures/web-docs.alternatefutures.ai/blob/main/docs/guides/registry-architecture.md)
 - [API Documentation](https://docs.alternatefutures.ai)
 - [CLI Reference](https://docs.alternatefutures.ai/cli)
@@ -1151,6 +1217,7 @@ graph LR
 - **JWT**: JSON Web Token
 - **OCI**: Open Container Initiative
 - **SDL**: Service Definition Language (Akash)
+- **SGX**: Software Guard Extensions (Intel trusted execution)
 - **SIWE**: Sign-In with Ethereum
 - **SSL**: Secure Sockets Layer
 - **TLS**: Transport Layer Security
@@ -1158,5 +1225,5 @@ graph LR
 ---
 
 **Last Updated**: 2026-01-21  
-**Version**: 2.0.0  
+**Version**: 2.1.0  
 **Maintainers**: Alternate Futures Team
