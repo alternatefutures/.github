@@ -21,43 +21,80 @@ Comprehensive technical architecture map for the Alternate Futures decentralized
 
 Alternate Futures is a **decentralized cloud platform** (forked from Fleek) providing IPFS/Filecoin/Arweave hosting, serverless functions, container registry, and AI agent deployment capabilities.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    ALTERNATE FUTURES PLATFORM                       │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                       │
-│  ┌───────────────────────────────────────────────────────────────┐  │
-│  │                    Client Layer                                │  │
-│  ├───────────────────────────────────────────────────────────────┤  │
-│  │  Web Dashboard  │  CLI (af)  │  SDK  │  Docker Client        │  │
-│  └────────┬──────────────┬────────────┬──────────────┬───────────┘  │
-│           │              │            │              │              │
-│  ┌────────▼──────────────▼────────────▼──────────────▼───────────┐  │
-│  │                    API Gateway Layer                          │  │
-│  ├──────────────────────────────────────────────────────────────┤  │
-│  │  GraphQL API  │  Auth Service  │  Registry API              │  │
-│  └────────┬──────────────┬────────────┬──────────────────────────┘  │
-│           │              │            │                             │
-│  ┌────────▼──────────────▼────────────▼──────────────────────────┐  │
-│  │                    Service Layer                              │  │
-│  ├──────────────────────────────────────────────────────────────┤  │
-│  │  Sites/Apps  │  Functions  │  Agents  │  Storage  │  Billing │  │
-│  └────────┬──────────────┬────────────┬──────────────┬───────────┘  │
-│           │              │            │              │              │
-│  ┌────────▼──────────────▼────────────▼──────────────▼───────────┐  │
-│  │                   Storage & Infrastructure                    │  │
-│  ├──────────────────────────────────────────────────────────────┤  │
-│  │  PostgreSQL  │  IPFS  │  Arweave  │  Filecoin  │  Secrets   │  │
-│  └────────┬──────────────┬────────────┬──────────────┬───────────┘  │
-│           │              │            │              │              │
-│  ┌────────▼──────────────▼────────────▼──────────────▼───────────┐  │
-│  │                  Deployment Infrastructure                    │  │
-│  ├──────────────────────────────────────────────────────────────┤  │
-│  │              Akash Network (Decentralized Compute)           │  │
-│  │         SSL Proxy (Pingap) │ DNS (Multi-Provider)           │  │
-│  └──────────────────────────────────────────────────────────────┘  │
-│                                                                       │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph "ALTERNATE FUTURES PLATFORM"
+        subgraph "Client Layer"
+            WebDash[Web Dashboard]
+            CLI[CLI - af]
+            SDK[SDK]
+            Docker[Docker Client]
+        end
+        
+        subgraph "API Gateway Layer"
+            GraphQL[GraphQL API<br/>Yoga + Prisma]
+            Auth[Auth Service<br/>Hono + SQLite]
+            Registry[Registry API<br/>OCI Compatible]
+        end
+        
+        subgraph "Service Layer"
+            Sites[Sites/Apps]
+            Functions[Functions]
+            Agents[AI Agents]
+            Storage[Storage]
+            Billing[Billing]
+        end
+        
+        subgraph "Storage & Infrastructure"
+            Postgres[(PostgreSQL)]
+            IPFS[(IPFS/Kubo)]
+            Arweave[(Arweave)]
+            Filecoin[(Filecoin)]
+            Secrets[(Infisical<br/>Secrets)]
+        end
+        
+        subgraph "Deployment Infrastructure"
+            Akash[Akash Network<br/>Decentralized Compute]
+            Proxy[SSL Proxy<br/>Pingap]
+            DNS[Multi-Provider DNS<br/>Cloudflare/Google/deSEC]
+        end
+    end
+    
+    WebDash --> GraphQL
+    CLI --> GraphQL
+    SDK --> GraphQL
+    Docker --> Registry
+    
+    WebDash --> Auth
+    CLI --> Auth
+    SDK --> Auth
+    
+    GraphQL --> Sites
+    GraphQL --> Functions
+    GraphQL --> Agents
+    GraphQL --> Storage
+    GraphQL --> Billing
+    
+    Sites --> IPFS
+    Sites --> Arweave
+    Sites --> Filecoin
+    Functions --> IPFS
+    Agents --> IPFS
+    Storage --> IPFS
+    Storage --> Arweave
+    Storage --> Filecoin
+    
+    GraphQL --> Postgres
+    Auth --> Postgres
+    Registry --> Postgres
+    Registry --> IPFS
+    
+    GraphQL -.-> Secrets
+    Auth -.-> Secrets
+    Registry -.-> Secrets
+    
+    Proxy -.-> DNS
+    Akash -.-> Proxy
 ```
 
 ---
@@ -79,21 +116,18 @@ Alternate Futures is a **decentralized cloud platform** (forked from Fleek) prov
 
 **Purpose**: Entry points for all client requests
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                      API Gateway Layer                       │
-├──────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┌────────────────┐  ┌─────────────────┐  ┌─────────────┐  │
-│  │  GraphQL API   │  │  Auth Service   │  │  Registry   │  │
-│  │  (Yoga + Prisma│  │  (Hono + SQLite)│  │  (OCI API)  │  │
-│  └───────┬────────┘  └────────┬────────┘  └──────┬──────┘  │
-│          │                    │                   │          │
-│     api.alternatefutures.ai                                  │
-│     auth.alternatefutures.ai                                 │
-│     registry.alternatefutures.ai                             │
-│                                                              │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+graph LR
+    subgraph "API Gateway Layer"
+        GraphQL[GraphQL API<br/>Yoga + Prisma<br/>api.alternatefutures.ai]
+        Auth[Auth Service<br/>Hono + SQLite<br/>auth.alternatefutures.ai]
+        Registry[Registry API<br/>OCI Compatible<br/>registry.alternatefutures.ai]
+    end
+    
+    GraphQL --> DB[(PostgreSQL)]
+    Auth --> AuthDB[(SQLite)]
+    Registry --> RegDB[(PostgreSQL)]
+    Registry --> IPFS[(IPFS)]
 ```
 
 ### 3. Service Layer
@@ -113,25 +147,24 @@ Alternate Futures is a **decentralized cloud platform** (forked from Fleek) prov
 
 **Purpose**: Persistent data storage
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Storage Layer                        │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  ┌──────────────┐  ┌───────────┐  ┌─────────────────┐ │
-│  │  PostgreSQL  │  │   IPFS    │  │ Arweave/Filecoin│ │
-│  │              │  │  (Kubo)   │  │                 │ │
-│  │  Metadata    │  │  Content  │  │  Permanent      │ │
-│  │  Users       │  │  Blobs    │  │  Storage        │ │
-│  │  Sites       │  │  Files    │  │                 │ │
-│  │  Deployments │  │           │  │                 │ │
-│  └──────────────┘  └───────────┘  └─────────────────┘ │
-│                                                         │
-│  ┌──────────────┐  ┌───────────┐                      │
-│  │  Infisical   │  │  SQLite   │                      │
-│  │  (Secrets)   │  │  (Auth)   │                      │
-│  └──────────────┘  └───────────┘                      │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph "Storage Layer"
+        subgraph "Relational Data"
+            PG[(PostgreSQL<br/>Metadata, Users,<br/>Sites, Deployments)]
+            SQLite[(SQLite<br/>Auth Data)]
+        end
+        
+        subgraph "Content Storage"
+            IPFS[(IPFS/Kubo<br/>Content, Blobs,<br/>Files)]
+            Arweave[(Arweave<br/>Permanent Storage)]
+            Filecoin[(Filecoin<br/>Decentralized Storage)]
+        end
+        
+        subgraph "Secrets"
+            Infisical[(Infisical<br/>Secret Management)]
+        end
+    end
 ```
 
 ### 5. Infrastructure Layer
@@ -211,23 +244,19 @@ Alternate Futures is a **decentralized cloud platform** (forked from Fleek) prov
 - PostgreSQL (metadata)
 
 **Architecture**:
-```
-┌────────────────────────────────────────────┐
-│        Container Registry Stack            │
-├────────────────────────────────────────────┤
-│                                            │
-│  ┌──────────────┐  ┌──────────────────┐  │
-│  │ OpenRegistry │◄─┤   PostgreSQL     │  │
-│  │  (OCI API)   │  │   (Metadata)     │  │
-│  └──────┬───────┘  └──────────────────┘  │
-│         │                                  │
-│         ▼                                  │
-│  ┌──────────────┐                        │
-│  │ IPFS (Kubo)  │                        │
-│  │ (Blob Store) │                        │
-│  └──────────────┘                        │
-│                                            │
-└────────────────────────────────────────────┘
+
+```mermaid
+graph TB
+    subgraph "Container Registry Stack"
+        OpenReg[OpenRegistry<br/>OCI API Server]
+        RegDB[(PostgreSQL<br/>Metadata)]
+        RegIPFS[(IPFS Kubo<br/>Blob Storage)]
+    end
+    
+    OpenReg <--> RegDB
+    OpenReg --> RegIPFS
+    
+    Docker[Docker Client] -->|docker push/pull| OpenReg
 ```
 
 **Features**:
@@ -405,24 +434,22 @@ All services run on **Akash Network**, a decentralized compute marketplace.
 
 ### Traffic Flow
 
-```
-                    Internet
-                       │
-        ┌──────────────┴──────────────┐
-        │                             │
-        ▼                             ▼
-┌───────────────┐           ┌─────────────────┐
-│  SSL Proxy    │           │ Secrets Service │
-│ 170.75.255.101│           │  (Direct/       │
-│               │           │   Isolated)     │
-└───────┬───────┘           └─────────────────┘
-        │
-        ├─► auth.alternatefutures.ai
-        ├─► api.alternatefutures.ai
-        ├─► app.alternatefutures.ai
-        ├─► docs.alternatefutures.ai
-        ├─► registry.alternatefutures.ai
-        └─► alternatefutures.ai
+```mermaid
+graph TB
+    Internet((Internet))
+    
+    Internet --> Proxy[SSL Proxy<br/>170.75.255.101]
+    Internet --> Secrets[Secrets Service<br/>Direct/Isolated]
+    
+    Proxy --> Auth[auth.alternatefutures.ai]
+    Proxy --> API[api.alternatefutures.ai]
+    Proxy --> App[app.alternatefutures.ai]
+    Proxy --> Docs[docs.alternatefutures.ai]
+    Proxy --> Reg[registry.alternatefutures.ai]
+    Proxy --> Web[alternatefutures.ai]
+    
+    style Secrets fill:#f9f,stroke:#333,stroke-width:2px
+    style Proxy fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
 ### DNS Architecture
@@ -448,111 +475,105 @@ Multi-provider setup for redundancy:
 
 ### Site Deployment Flow
 
-```
-┌──────────┐
-│  User    │
-│ (CLI/UI) │
-└────┬─────┘
-     │ 1. af deploy / UI deploy
-     ▼
-┌──────────────┐
-│  Auth Check  │
-└──────┬───────┘
-       │ 2. JWT token validation
-       ▼
-┌──────────────┐
-│  GraphQL API │
-└──────┬───────┘
-       │ 3. Create deployment record
-       │ 4. Upload files
-       ▼
-┌──────────────┐
-│   Storage    │
-│ IPFS/Arweave │
-└──────┬───────┘
-       │ 5. Return CID/hash
-       ▼
-┌──────────────┐
-│  PostgreSQL  │
-│ Save metadata│
-└──────┬───────┘
-       │ 6. Update deployment status
-       ▼
-┌──────────────┐
-│   Gateway    │
-│ IPFS/Custom  │
-└──────┬───────┘
-       │ 7. Site accessible at gateway
-       ▼
-┌──────────────┐
-│   User       │
-│ View site    │
-└──────────────┘
+```mermaid
+sequenceDiagram
+    actor User
+    participant CLI as CLI/Web UI
+    participant Auth as Auth Service
+    participant API as GraphQL API
+    participant Storage as IPFS/Arweave
+    participant DB as PostgreSQL
+    participant Gateway as IPFS Gateway
+    
+    User->>CLI: af deploy / UI deploy
+    CLI->>Auth: Authenticate
+    Auth-->>CLI: JWT Token
+    
+    CLI->>API: Deploy request + JWT
+    API->>API: Validate token
+    API->>DB: Create deployment record
+    
+    CLI->>Storage: Upload files
+    Storage-->>CLI: Return CID/hash
+    
+    CLI->>API: Update with CID
+    API->>DB: Save metadata
+    API->>DB: Update deployment status
+    
+    API-->>CLI: Deployment complete
+    CLI-->>User: Success
+    
+    User->>Gateway: Access site
+    Gateway->>Storage: Fetch content (CID)
+    Storage-->>Gateway: Return files
+    Gateway-->>User: Render site
 ```
 
 ### Registry Push Flow
 
-```
-┌──────────┐
-│  Docker  │
-│  Client  │
-└────┬─────┘
-     │ 1. docker push registry.alternatefutures.ai/app:v1
-     ▼
-┌──────────────┐
-│ OpenRegistry │
-└──────┬───────┘
-       │ 2. Authenticate (JWT)
-       │ 3. Split into layers (blobs)
-       │ 4. For each layer:
-       ▼
-┌──────────────┐
-│  IPFS (Kubo) │
-└──────┬───────┘
-       │ 5. Store blob, return CID
-       │ 6. Pin CID
-       ▼
-┌──────────────┐
-│  PostgreSQL  │
-└──────┬───────┘
-       │ 7. Store digest → CID mapping
-       │ 8. Store manifest
-       ▼
-┌──────────────┐
-│   Complete   │
-└──────────────┘
+```mermaid
+sequenceDiagram
+    actor User
+    participant Docker as Docker Client
+    participant Reg as OpenRegistry
+    participant IPFS as IPFS/Kubo
+    participant DB as PostgreSQL
+    
+    User->>Docker: docker push registry.af.ai/app:v1
+    Docker->>Reg: Authenticate (JWT)
+    Reg-->>Docker: 200 OK
+    
+    Docker->>Reg: Upload manifest
+    Reg->>Reg: Split into layers (blobs)
+    
+    loop For each layer
+        Reg->>IPFS: Store blob
+        IPFS-->>Reg: Return CID
+        Reg->>IPFS: Pin CID
+        Reg->>DB: Store digest → CID mapping
+    end
+    
+    Reg->>DB: Store manifest
+    Reg-->>Docker: Push complete
+    Docker-->>User: Success
 ```
 
 ### Authentication Flow
 
-```
-┌─────────┐
-│  User   │
-└────┬────┘
-     │ 1. Login request
-     ▼
-┌──────────────┐
-│ Auth Service │
-└──────┬───────┘
-       │ 2. Verify credentials
-       │    (email magic link, Web3, OAuth, etc.)
-       ▼
-┌──────────────┐
-│  Generate    │
-│  JWT Token   │
-└──────┬───────┘
-       │ 3. Return token
-       ▼
-┌──────────────┐
-│   Client     │
-│ Store token  │
-└──────┬───────┘
-       │ 4. Include in future requests
-       ▼
-┌──────────────┐
-│ GraphQL API  │
-│ Verify token │
-└──────────────┘
+```mermaid
+sequenceDiagram
+    actor User
+    participant Client as Client App
+    participant Auth as Auth Service
+    participant Provider as Auth Provider<br/>(Email/Web3/OAuth)
+    participant API as GraphQL API
+    
+    User->>Client: Login request
+    Client->>Auth: Initiate auth
+    Auth->>Provider: Verify credentials
+    
+    alt Email Magic Link
+        Provider->>User: Send magic link
+        User->>Provider: Click link
+    else Web3 Wallet
+        Provider->>User: Sign message
+        User->>Provider: Signed message
+    else OAuth
+        Provider->>User: OAuth flow
+        User->>Provider: Authorize
+    end
+    
+    Provider-->>Auth: Verification success
+    Auth->>Auth: Generate JWT token
+    Auth-->>Client: Return JWT
+    
+    Client->>Client: Store token
+    
+    User->>Client: Make API request
+    Client->>API: Request + JWT token
+    API->>API: Verify token
+    API-->>Client: Response
+    Client-->>User: Display result
 ```
 
 ---
@@ -702,6 +723,43 @@ Multi-provider setup for redundancy:
 
 ### Network Security
 
+```mermaid
+graph TB
+    subgraph "Security Layers"
+        subgraph "External"
+            CF[Cloudflare<br/>DDoS Protection]
+            DNS[Multi-Provider DNS<br/>Failover]
+        end
+        
+        subgraph "SSL/TLS"
+            LE[Let's Encrypt<br/>DNS-01 Challenge]
+            Proxy[SSL Proxy<br/>TLS 1.2+]
+        end
+        
+        subgraph "Application"
+            Rate[Rate Limiting]
+            JWT[JWT Validation]
+            GraphQL[GraphQL Complexity<br/>Analysis]
+        end
+        
+        subgraph "Data"
+            Encrypt[TLS/HTTPS<br/>In Transit]
+            Vault[Infisical<br/>Secrets Vault]
+            CID[IPFS CID<br/>Verification]
+        end
+    end
+    
+    CF --> Proxy
+    DNS -.-> CF
+    LE --> Proxy
+    Proxy --> Rate
+    Rate --> JWT
+    JWT --> GraphQL
+    GraphQL --> Encrypt
+    Encrypt --> Vault
+    Vault -.-> CID
+```
+
 **SSL/TLS**:
 - Let's Encrypt certificates
 - DNS-01 challenge via Cloudflare
@@ -738,6 +796,24 @@ Multi-provider setup for redundancy:
 
 All services deployed on **Akash Network**, a decentralized compute marketplace where providers bid on workloads.
 
+```mermaid
+graph LR
+    subgraph "Akash Network"
+        SDL[SDL Definition] -->|Deploy| Marketplace[Akash Marketplace]
+        Marketplace -->|Bids| P1[Provider 1]
+        Marketplace -->|Bids| P2[Provider 2]
+        Marketplace -->|Bids| P3[Provider 3]
+        
+        P1 -->|Selected| Deployment[Running Deployment]
+        
+        Deployment --> Monitor[Monitoring/Health]
+        Deployment --> Storage[(Persistent Storage)]
+    end
+    
+    User((User)) -->|Create| SDL
+    User -->|Monitor| Monitor
+```
+
 **Benefits**:
 - Censorship resistance
 - Geographic distribution
@@ -758,6 +834,42 @@ All services deployed on **Akash Network**, a decentralized compute marketplace 
 - Redundant storage recommended
 
 ### High Availability
+
+```mermaid
+graph TB
+    subgraph "High Availability Strategy"
+        subgraph "DNS Layer"
+            CF[Cloudflare<br/>Primary]
+            GCP[Google DNS<br/>Secondary]
+            DeSEC[deSEC<br/>Secondary]
+        end
+        
+        subgraph "Storage Layer"
+            P1[Pinata]
+            P2[Web3.Storage]
+            P3[Lighthouse]
+            IPFS[IPFS]
+            AR[Arweave]
+            FC[Filecoin]
+        end
+        
+        subgraph "Compute Layer"
+            Akash1[Akash Provider 1]
+            Akash2[Akash Provider 2<br/>Failover]
+        end
+    end
+    
+    CF -.->|Failover| GCP
+    GCP -.->|Failover| DeSEC
+    
+    P1 -.->|Redundancy| IPFS
+    P2 -.->|Redundancy| IPFS
+    P3 -.->|Redundancy| IPFS
+    IPFS -.->|Backup| AR
+    IPFS -.->|Backup| FC
+    
+    Akash1 -.->|Failover| Akash2
+```
 
 **Multi-Provider Strategy**:
 - DNS: Cloudflare (primary), Google DNS, deSEC
@@ -794,6 +906,27 @@ All services deployed on **Akash Network**, a decentralized compute marketplace 
 
 ### Internal Communication
 
+```mermaid
+graph TB
+    subgraph "Service-to-Service"
+        API[GraphQL API] <-->|JWT Validation| Auth[Auth Service]
+        API <-->|Prisma ORM| PG[(PostgreSQL)]
+        Reg[OpenRegistry] <-->|SQL| RegDB[(PostgreSQL)]
+        Reg -->|HTTP API| IPFS[(IPFS)]
+        
+        API -.->|Secrets| Inf[Infisical]
+        Auth -.->|Secrets| Inf
+        Reg -.->|Secrets| Inf
+    end
+    
+    subgraph "Client-to-Service"
+        WebUI[Web Dashboard] -->|GraphQL| API
+        CLI[CLI Tool] -->|GraphQL| API
+        SDK[SDK] -->|GraphQL| API
+        Docker[Docker Client] -->|OCI HTTP| Reg
+    end
+```
+
 **Service-to-Service**:
 - GraphQL API ↔ Auth Service (JWT validation)
 - GraphQL API ↔ PostgreSQL (Prisma ORM)
@@ -812,6 +945,31 @@ All services deployed on **Akash Network**, a decentralized compute marketplace 
 ## Scalability
 
 ### Horizontal Scaling
+
+```mermaid
+graph TB
+    subgraph "Horizontal Scaling Architecture"
+        LB[Load Balancer]
+        
+        LB --> API1[GraphQL API<br/>Instance 1]
+        LB --> API2[GraphQL API<br/>Instance 2]
+        LB --> API3[GraphQL API<br/>Instance 3]
+        
+        API1 --> DB[(Shared PostgreSQL)]
+        API2 --> DB
+        API3 --> DB
+        
+        RegLB[Registry LB]
+        RegLB --> Reg1[Registry<br/>Instance 1]
+        RegLB --> Reg2[Registry<br/>Instance 2]
+        
+        Reg1 --> RegDB[(Shared PostgreSQL)]
+        Reg2 --> RegDB
+        
+        Reg1 --> SharedIPFS[(Shared IPFS)]
+        Reg2 --> SharedIPFS
+    end
+```
 
 **API Server**:
 - Multiple instances behind load balancer
@@ -847,6 +1005,47 @@ All services deployed on **Akash Network**, a decentralized compute marketplace 
 ## Monitoring & Observability
 
 ### Metrics
+
+```mermaid
+graph LR
+    subgraph "Monitoring Stack"
+        subgraph "Application Metrics"
+            AppRate[Request Rate]
+            AppLatency[Latency]
+            AppErrors[Error Rate]
+            GraphQLComp[GraphQL Complexity]
+        end
+        
+        subgraph "Infrastructure Metrics"
+            CPU[CPU Usage]
+            Memory[Memory Usage]
+            Disk[Disk Usage]
+            Network[Network Bandwidth]
+            IPFS[IPFS Repo Size]
+        end
+        
+        subgraph "Business Metrics"
+            Users[Active Users]
+            Deploys[Deployments/Day]
+            StorageUse[Storage Usage]
+            Revenue[Revenue]
+        end
+    end
+    
+    AppRate --> Dashboard[Monitoring Dashboard]
+    AppLatency --> Dashboard
+    AppErrors --> Dashboard
+    GraphQLComp --> Dashboard
+    CPU --> Dashboard
+    Memory --> Dashboard
+    Disk --> Dashboard
+    Network --> Dashboard
+    IPFS --> Dashboard
+    Users --> Dashboard
+    Deploys --> Dashboard
+    StorageUse --> Dashboard
+    Revenue --> Dashboard
+```
 
 **Application Metrics**:
 - Request rate, latency, error rate
@@ -959,5 +1158,5 @@ All services deployed on **Akash Network**, a decentralized compute marketplace 
 ---
 
 **Last Updated**: 2026-01-21  
-**Version**: 1.0.0  
+**Version**: 2.0.0  
 **Maintainers**: Alternate Futures Team
