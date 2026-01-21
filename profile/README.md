@@ -282,6 +282,7 @@ We welcome contributions from developers of all skill levels!
 - **[AI Agents](https://docs.alternatefutures.ai/agents)** - Deploy autonomous agents
 
 ### Architecture
+- **[Technical Architecture Map](../TECHNICAL_ARCHITECTURE.md)** - Complete system architecture with Mermaid diagrams
 - **[Overview](https://docs.alternatefutures.ai/architecture)** - Platform architecture
 - **[DePIN Integration](https://docs.alternatefutures.ai/depin)** - Decentralized infrastructure
 - **[Security](https://docs.alternatefutures.ai/security)** - Security best practices
