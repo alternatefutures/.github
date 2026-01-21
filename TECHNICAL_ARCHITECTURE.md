@@ -1168,7 +1168,20 @@ graph LR
 
 ### Planned Features
 
-1. **Registry**:
+1. **MCP Server Integration**:
+   - Model Context Protocol servers for all services
+   - Enable AI assistants (Claude, ChatGPT, etc.) to interact with platform
+   - **Deployments MCP**: Manage Akash deployments, view logs, check status
+   - **Functions MCP**: Create, deploy, and manage serverless functions
+   - **Registry MCP**: Push/pull container images, manage repositories
+   - **Sites MCP**: Deploy static sites, update content, manage domains
+   - **Agents MCP**: Deploy and monitor AI agents
+   - **Billing MCP**: View usage, manage subscriptions, access invoices
+   - Standardized tool definitions for each service domain
+   - Authentication via Personal Access Tokens
+   - Real-time status updates and notifications
+
+2. **Registry**:
    - IPFS cluster for redundancy
    - Image signing (Cosign)
    - Vulnerability scanning (Trivy)
@@ -1176,14 +1189,14 @@ graph LR
    - Usage analytics
    - Webhook notifications
 
-2. **Platform**:
+3. **Platform**:
    - Real-time collaboration
    - AI agent marketplace
    - Template marketplace
    - Custom domain SSL automation
    - Enhanced function analytics and monitoring
 
-3. **Infrastructure**:
+4. **Infrastructure**:
    - Multi-cloud support (beyond Akash)
    - Backup/restore automation
    - Disaster recovery
@@ -1208,6 +1221,7 @@ graph LR
 - [Arweave](https://arweave.org)
 - [Filecoin](https://filecoin.io)
 - [OCI Distribution Spec](https://github.com/opencontainers/distribution-spec)
+- [Model Context Protocol](https://modelcontextprotocol.io)
 
 ### Related Files
 
@@ -1228,6 +1242,7 @@ graph LR
 - **IPFS**: InterPlanetary File System
 - **IPNS**: InterPlanetary Name System
 - **JWT**: JSON Web Token
+- **MCP**: Model Context Protocol (AI assistant integration standard)
 - **OCI**: Open Container Initiative
 - **SDL**: Service Definition Language (Akash)
 - **SGX**: Software Guard Extensions (Intel trusted execution)
@@ -1238,5 +1253,5 @@ graph LR
 ---
 
 **Last Updated**: 2026-01-21  
-**Version**: 2.2.0  
+**Version**: 2.3.0  
 **Maintainers**: Alternate Futures Team
