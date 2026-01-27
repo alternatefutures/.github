@@ -29,7 +29,7 @@ Comprehensive technical architecture map for the Alternate Futures decentralized
 
 ## System Overview
 
-Alternate Futures is a **decentralized cloud platform** (forked from Fleek) providing IPFS/Filecoin/Arweave hosting, serverless functions, container registry, and AI agent deployment capabilities with **Internet Computer (ICP) integration** for canister-based deployments.
+Alternate Futures is a **decentralized cloud platform** (forked from Fleek) providing IPFS/Filecoin/Arweave/**ICP** hosting, serverless functions, container registry, and AI agent deployment capabilities.
 
 ```mermaid
 graph TB
@@ -45,16 +45,14 @@ graph TB
             GraphQL[GraphQL API<br/>Yoga + Prisma]
             Auth[Auth Service<br/>Hono + SQLite]
             Registry[Registry API<br/>OCI Compatible]
-            ICPGateway[ICP Gateway API<br/>Canister Endpoints]
         end
         
         subgraph "Service Layer"
-            Sites[Sites/Apps]
-            Functions[Functions]
-            Agents[AI Agents]
-            Storage[Storage]
-            Billing[Billing]
-            ICPCanisters[ICP Canisters<br/>Backend Services]
+            Sites[Sites/Apps Service<br/>IPFS/Arweave/Filecoin/ICP]
+            Functions[Functions Service<br/>Akash/ICP Canisters]
+            Agents[AI Agents Service<br/>Akash/ICP Canisters]
+            Storage[Storage Service<br/>IPFS/Arweave/Filecoin/ICP]
+            Billing[Billing Service]
         end
         
         subgraph "Storage & Infrastructure"
@@ -62,13 +60,12 @@ graph TB
             IPFS[(IPFS/Kubo)]
             Arweave[(Arweave)]
             Filecoin[(Filecoin)]
+            ICPNetwork[(Internet Computer<br/>Canisters & Storage)]
             Secrets[(Infisical<br/>Secrets)]
-            ICPStorage[(ICP Storage<br/>Stable Memory)]
         end
         
         subgraph "Deployment Infrastructure"
             Akash[Akash Network<br/>Decentralized Compute]
-            ICP[Internet Computer<br/>Canister Hosting]
             Proxy[SSL Proxy<br/>Pingap]
             DNS[Multi-Provider DNS<br/>Cloudflare/Google/deSEC]
         end
@@ -83,37 +80,34 @@ graph TB
     CLI --> Auth
     SDK --> Auth
     
-    WebDash --> ICPGateway
-    CLI --> ICPGateway
-    SDK --> ICPGateway
-    
     GraphQL --> Sites
     GraphQL --> Functions
     GraphQL --> Agents
     GraphQL --> Storage
     GraphQL --> Billing
     
-    ICPGateway --> ICPCanisters
-    
     Sites --> IPFS
     Sites --> Arweave
     Sites --> Filecoin
-    Sites --> ICP
+    Sites --> ICPNetwork
+    
     Functions --> IPFS
-    Functions --> ICP
+    Functions --> ICPNetwork
+    Functions --> Akash
+    
     Agents --> IPFS
-    Agents --> ICP
+    Agents --> ICPNetwork
+    Agents --> Akash
+    
     Storage --> IPFS
     Storage --> Arweave
     Storage --> Filecoin
-    Storage --> ICPStorage
+    Storage --> ICPNetwork
     
     GraphQL --> Postgres
     Auth --> Postgres
     Registry --> Postgres
     Registry --> IPFS
-    
-    ICPCanisters --> ICPStorage
     
     GraphQL -.-> Secrets
     Auth -.-> Secrets
@@ -121,12 +115,12 @@ graph TB
     
     Proxy -.-> DNS
     Akash -.-> Proxy
-    ICP -.-> Proxy
     
-    style ICPGateway fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
-    style ICPCanisters fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
-    style ICPStorage fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
-    style ICP fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style ICPNetwork fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style Sites fill:#ffe,stroke:#333,stroke-width:2px
+    style Functions fill:#ffe,stroke:#333,stroke-width:2px
+    style Agents fill:#ffe,stroke:#333,stroke-width:2px
+    style Storage fill:#ffe,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -154,31 +148,26 @@ graph LR
         GraphQL[GraphQL API<br/>Yoga + Prisma<br/>api.alternatefutures.ai]
         Auth[Auth Service<br/>Hono + SQLite<br/>auth.alternatefutures.ai]
         Registry[Registry API<br/>OCI Compatible<br/>registry.alternatefutures.ai]
-        ICPGateway[ICP Gateway<br/>Canister API<br/>icp.alternatefutures.ai]
     end
     
     GraphQL --> DB[(PostgreSQL)]
     Auth --> AuthDB[(SQLite)]
     Registry --> RegDB[(PostgreSQL)]
     Registry --> IPFS[(IPFS)]
-    ICPGateway --> ICPCanisters[(ICP Canisters)]
-    
-    style ICPGateway fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
-    style ICPCanisters fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
 ```
 
 ### 3. Service Layer
 
 **Purpose**: Core business logic and functionality
 
-| Service | Purpose | Technology | Repository |
-|---------|---------|-----------|------------|
-| Sites/Apps | Static site & app hosting | IPFS/Arweave/Filecoin/**ICP** | `service-cloud-api` |
-| Functions | Serverless edge functions with Node.js runtime, Web APIs, SGX support | Runtime containers + IPFS/**ICP Canisters** | `service-cloud-api` |
-| Agents | AI agent deployment | Container orchestration/**ICP Canisters** | `service-cloud-api` |
-| Storage | Decentralized file storage | IPFS/Arweave/Filecoin/**ICP Storage** | `service-cloud-api` |
-| Billing | Payment processing | Stripe/**ICP Ledger** | `service-cloud-api` |
-| Registry | Container image storage | IPFS + PostgreSQL | Separate stack |
+| Service | Purpose | Technology | Deployment Targets |
+|---------|---------|-----------|-------------------|
+| Sites/Apps | Static site & app hosting | IPFS/Arweave/Filecoin/**ICP** | `--target ipfs\|arweave\|filecoin\|icp` |
+| Functions | Serverless edge functions with Node.js runtime, Web APIs, SGX support | Akash containers + **ICP Canisters** | `--target akash\|icp` |
+| Agents | AI agent deployment | Akash containers + **ICP Canisters** | `--target akash\|icp` |
+| Storage | Decentralized file storage | IPFS/Arweave/Filecoin/**ICP Stable Memory** | `--target ipfs\|arweave\|filecoin\|icp` |
+| Billing | Payment processing | Stripe | N/A |
+| Registry | Container image storage | IPFS + PostgreSQL | N/A |
 
 ### 4. Storage & Data Layer
 
@@ -192,11 +181,11 @@ graph TB
             SQLite[(SQLite<br/>Auth Data)]
         end
         
-        subgraph "Content Storage"
+        subgraph "Content Storage (Deployment Targets)"
             IPFS[(IPFS/Kubo<br/>Content, Blobs,<br/>Files)]
             Arweave[(Arweave<br/>Permanent Storage)]
             Filecoin[(Filecoin<br/>Decentralized Storage)]
-            ICPStorage[(ICP Storage<br/>Stable Memory<br/>Asset Canisters)]
+            ICPStorage[(ICP<br/>Canisters & Stable Memory<br/>Asset Storage)]
         end
         
         subgraph "Secrets"
@@ -212,7 +201,7 @@ graph TB
 **Purpose**: Deployment and network infrastructure
 
 - **Akash Network**: Decentralized compute platform hosting containerized services
-- **Internet Computer (ICP)**: Decentralized canister hosting for backend services and storage
+- **Internet Computer (ICP)**: Deployment target for canisters (sites, functions, agents, storage)
 - **SSL Proxy (Pingap)**: SSL termination and traffic routing
 - **DNS**: Multi-provider DNS (Cloudflare, Google, deSEC)
 - **Monitoring**: Observability and health checks
@@ -230,18 +219,18 @@ graph TB
 - Prisma (ORM)
 - PostgreSQL (database)
 - Node.js/TypeScript
-- **ICP Agent SDK (for canister communication)**
+- **ICP Agent SDK (for canister deployment)**
 
 **Responsibilities**:
 - User management
 - Project management
 - Site/deployment management
 - IPFS/Arweave/Filecoin/**ICP** integration
-- Billing (Stripe/**ICP Ledger**)
+- Billing (Stripe)
 - API key management
-- Function management
-- Agent deployment
-- **ICP canister lifecycle management**
+- Function management (Akash/**ICP Canisters**)
+- Agent deployment (Akash/**ICP Canisters**)
+- **ICP canister deployment and lifecycle management**
 
 **Endpoints**:
 - `https://api.alternatefutures.ai/graphql`
@@ -252,7 +241,7 @@ graph TB
 - Rate limiting
 - JWT authentication
 - Personal Access Tokens
-- **ICP Internet Identity integration**
+- **ICP Agent SDK integration for canister management**
 
 ### 2. Auth Service (`service-auth`)
 
@@ -326,16 +315,20 @@ See [Registry Architecture Documentation](https://github.com/alternatefutures/we
 - IPFS (code storage)
 - RuntimeRouter (request handling & routing)
 - Optional SGX (Software Guard Extensions)
-- **ICP Canisters (alternative serverless backend)**
+- **ICP Canisters (as deployment target for serverless functions)**
+
+**Deployment Targets**:
+- **Akash**: Traditional container-based serverless runtime
+- **ICP Canisters**: Internet Computer canister-based functions
 
 **Capabilities**:
 - **Serverless Edge Execution**: Functions run on the edge, close to users
 - **Web Standard APIs**: Full support for `fetch`, `Request`, `Response`, and other Web APIs
 - **Node.js Compatibility**: Node.js-compatible runtime environment
-- **ICP Canister Functions**: Deploy functions as Internet Computer canisters
+- **Multi-Target Deployment**: Deploy to Akash or ICP based on needs
 - **Route Configuration**: Flexible route patterns (`/api/*`, `/users/:id`, etc.)
 - **Automatic Scaling**: Scales based on demand (ICP canisters scale automatically)
-- **SGX Support**: Optional encrypted execution for confidential computing
+- **SGX Support**: Optional encrypted execution for confidential computing (Akash)
 - **IPFS Code Storage**: Function code stored and retrieved from IPFS via CID
 - **ICP Stable Memory**: Persistent state storage in ICP canisters
 - **Custom Domains**: Mount functions on custom domains or use default URLs
@@ -352,44 +345,49 @@ See [Registry Architecture Documentation](https://github.com/alternatefutures/we
 
 **URLs**:
 - Default (Akash): `https://<function-slug>.af-functions.app`
-- Default (ICP): `https://<canister-id>.ic0.app` or `https://<function-slug>.icp.alternatefutures.ai`
+- Default (ICP): `https://<canister-id>.ic0.app` or custom domain
 - Custom domains supported
 
 **Management**:
-- CLI: `af functions create`, `af functions deploy`
+- CLI: `af functions deploy --target akash|icp`
 - SDK: Full programmatic API via `@alternatefutures/sdk`
-- Web Dashboard: Visual function management
+- Web Dashboard: Visual function management with target selection
 
 **Architecture**:
 
 ```mermaid
 graph TB
-    subgraph "Function Runtime"
-        Request[Incoming Request] --> Router[RuntimeRouter]
-        Router -->|Route Match| Proxy[Proxy to Backend]
-        Router -->|No Match| Executor[Function Executor]
+    subgraph "Function Deployment Flow"
+        Request[Deploy Request] --> ChooseTarget{Choose Target}
         
-        Executor --> StorageChoice{Storage Backend}
-        StorageChoice -->|IPFS| IPFS[(IPFS<br/>Fetch Code by CID)]
-        StorageChoice -->|ICP| ICPStorage[(ICP Canister<br/>Stable Memory)]
+        ChooseTarget -->|--target akash| AkashPath[Akash Deployment]
+        ChooseTarget -->|--target icp| ICPPath[ICP Deployment]
         
-        IPFS --> Runtime[Sandboxed Runtime<br/>Node.js + Web APIs]
-        ICPStorage --> ICPRuntime[ICP Wasm Runtime<br/>Motoko/Rust]
-        Runtime -->|Optional| SGX[SGX Enclave<br/>Encrypted Execution]
+        AkashPath --> IPFS[(Store Code in IPFS)]
+        IPFS --> AkashContainer[Deploy to Akash Container]
+        AkashContainer --> AkashRuntime[Node.js Runtime + Web APIs]
+        AkashRuntime -->|Optional| SGX[SGX Enclave]
         
-        Runtime --> Response[Response]
-        ICPRuntime --> Response
-        Proxy --> Response
+        ICPPath --> ICPCanister[Create/Update Canister]
+        ICPCanister --> ICPWasm[Compile to Wasm]
+        ICPWasm --> ICPRuntime[Deploy to ICP Runtime]
+        ICPRuntime --> StableMemory[Stable Memory for State]
+        
+        AkashRuntime --> Response[Function Endpoint]
         SGX --> Response
+        ICPRuntime --> Response
     end
     
-    style ICPStorage fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style ICPPath fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style ICPCanister fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style ICPWasm fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
     style ICPRuntime fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style StableMemory fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
 ```
 
 **Security**:
 - Environment variable support for secrets
-- SGX for encrypted execution and attestation
+- SGX for encrypted execution and attestation (Akash)
 - Code integrity verification via BLAKE3 hash
 - **ICP Internet Identity authentication**
 - **ICP canister sandboxing and security model**
@@ -409,26 +407,7 @@ See [Functions Documentation](https://github.com/alternatefutures/web-docs.alter
 **Endpoints**:
 - `https://secrets.alternatefutures.ai`
 
-### 6. ICP Gateway Service (NEW)
-
-**Repository**: `alternatefutures/service-icp-gateway`
-
-**Technology Stack**:
-- ICP Agent SDK
-- HTTP Gateway for canisters
-- Node.js/TypeScript
-
-**Purpose**:
-- Canister lifecycle management (create, deploy, upgrade, delete)
-- HTTP gateway for canister access
-- Cycles management for canister computation
-- Identity management and authentication
-- Asset canister management for static hosting
-
-**Endpoints**:
-- `https://icp.alternatefutures.ai`
-
-### 7. Proxy Service (`infrastructure-proxy`)
+### 6. Proxy Service (`infrastructure-proxy`)
 
 **Repository**: `alternatefutures/infrastructure-proxy`
 
@@ -452,9 +431,8 @@ See [Functions Documentation](https://github.com/alternatefutures/web-docs.alter
 - docs.alternatefutures.ai → Documentation
 - alternatefutures.ai → Company Website
 - registry.alternatefutures.ai → Container Registry
-- **icp.alternatefutures.ai → ICP Gateway Service**
 
-### 8. DNS Management (`infrastructure-dns`)
+### 7. DNS Management (`infrastructure-dns`)
 
 **Repository**: `alternatefutures/infrastructure-dns`
 
@@ -494,11 +472,11 @@ See [Functions Documentation](https://github.com/alternatefutures/web-docs.alter
 
 **Features**:
 - Project management
-- Site deployment (IPFS/Arweave/Filecoin/**ICP**)
-- Function management (Akash/**ICP Canisters**)
-- Agent deployment (Akash/**ICP Canisters**)
+- Site deployment with target selection (IPFS/Arweave/Filecoin/**ICP**)
+- Function management with target selection (Akash/**ICP**)
+- Agent deployment with target selection (Akash/**ICP**)
 - API key management
-- **ICP cycles management**
+- **ICP cycles management UI**
 - Billing dashboard
 - Real-time deployment logs
 - Multi-language support
@@ -513,17 +491,17 @@ See [Functions Documentation](https://github.com/alternatefutures/web-docs.alter
 
 **Binary Name**: `af`
 
-**Technology**: Node.js + Commander.js + **ICP Agent SDK**
+**Technology**: Node.js + Commander.js + **ICP Agent SDK** + **dfx (ICP CLI)**
 
 **Features**:
-- Site deployment (`af deploy` with `--target icp` option)
-- Site management (`af sites list`)
-- Function deployment (`af functions deploy --target icp`)
-- **ICP canister management (`af icp create`, `af icp deploy`)**
-- Agent deployment
+- Site deployment: `af sites deploy --target icp|ipfs|arweave|filecoin`
+- Site management: `af sites list`
+- Function deployment: `af functions deploy --target akash|icp`
+- Agent deployment: `af agents deploy --target akash|icp`
+- **ICP canister management: `af icp canister create`, `af icp canister deploy`**
 - Authentication (including **Internet Identity**)
 - Configuration management
-- **Cycles management (`af icp cycles`)**
+- **Cycles management: `af icp cycles top-up`**
 
 **Installation**:
 ```bash
@@ -538,8 +516,9 @@ npm install -g @alternatefutures/cli
 
 **Features**:
 - Programmatic API access
-- Site deployment (IPFS/Arweave/Filecoin/**ICP**)
+- Site deployment with target parameter (IPFS/Arweave/Filecoin/**ICP**)
 - File upload to IPFS/Arweave/**ICP Storage**
+- Function deployment to Akash/**ICP Canisters**
 - **ICP canister deployment and management**
 - Project management
 - TypeScript support
@@ -562,7 +541,7 @@ npm install @alternatefutures/sdk
 - CLI reference
 - SDK reference
 - Architecture documentation
-- **ICP integration guide**
+- **ICP deployment guide**
 - **Canister development tutorials**
 
 **URL**: `https://docs.alternatefutures.ai`
@@ -592,20 +571,25 @@ All services can be deployed on multiple decentralized platforms:
 | SSL Proxy | 24758214 | leet.haus | 170.75.255.101 (dedicated) | 2 CPU, 4GB RAM |
 | Secrets (Infisical) | 24672527 | Europlots | ddchr1pel5e0p8i0c46drjpclg.ingress.europlots.com | 2 CPU, 4GB RAM, 20GB storage |
 
-#### Internet Computer Deployments (NEW)
+#### Internet Computer as Deployment Target
 
-| Service | Canister ID | Subnet | Purpose |
-|---------|-------------|--------|---------|
-| ICP Gateway | TBD | Application | Canister management API |
-| Auth Canister | TBD | Application | Internet Identity integration |
-| Static Assets | TBD | System | Static site hosting |
+ICP is used as a deployment target for:
+- **Static Sites**: Deployed to asset canisters via `af sites deploy --target icp`
+- **Functions**: Deployed to ICP canisters via `af functions deploy --target icp`
+- **AI Agents**: Deployed to ICP canisters via `af agents deploy --target icp`
+- **Storage**: Files stored in ICP stable memory via `af storage upload --target icp`
+
+**Management Tools**:
+- `af` CLI with `--target icp` flag
+- ICP Agent SDK integrated in GraphQL API
+- dfx CLI for advanced canister operations
 
 **Deployment Management**:
 - Repository: `alternatefutures/admin`
 - File: `infrastructure/deployments.ts`
 - Tools: 
   - Akash MCP Server (for Akash deployments)
-  - **DFX CLI (for ICP canister management)**
+  - **ICP Agent SDK (for ICP canister management)**
 
 ### Traffic Flow
 
@@ -615,7 +599,7 @@ graph TB
     
     Internet --> Proxy[SSL Proxy<br/>170.75.255.101]
     Internet --> Secrets[Secrets Service<br/>Direct/Isolated]
-    Internet --> ICPBoundary[ICP Boundary Nodes<br/>Direct Access]
+    Internet --> ICPBoundary[ICP Boundary Nodes<br/>Direct Access to Canisters]
     
     Proxy --> Auth[auth.alternatefutures.ai]
     Proxy --> API[api.alternatefutures.ai]
@@ -623,16 +607,16 @@ graph TB
     Proxy --> Docs[docs.alternatefutures.ai]
     Proxy --> Reg[registry.alternatefutures.ai]
     Proxy --> Web[alternatefutures.ai]
-    Proxy --> ICPGateway[icp.alternatefutures.ai]
     
-    ICPBoundary --> ICPCanisters[ICP Canisters<br/>*.ic0.app]
-    ICPGateway --> ICPCanisters
+    API -->|Deploy --target icp| ICPDeploy[ICP Agent SDK]
+    ICPDeploy --> ICPBoundary
+    ICPBoundary --> UserCanisters[User Canisters<br/>Sites/Functions/Agents]
     
     style Secrets fill:#f9f,stroke:#333,stroke-width:2px
     style Proxy fill:#bbf,stroke:#333,stroke-width:2px
     style ICPBoundary fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
-    style ICPCanisters fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
-    style ICPGateway fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style UserCanisters fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style ICPDeploy fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
 ```
 
 ### DNS Architecture
@@ -656,7 +640,7 @@ Multi-provider setup for redundancy:
 
 ## Data Flow
 
-### Site Deployment Flow (with ICP Option)
+### Site Deployment Flow (with ICP Target)
 
 ```mermaid
 sequenceDiagram
@@ -668,46 +652,36 @@ sequenceDiagram
     participant DB as PostgreSQL
     participant Gateway as Gateway
     
-    User->>CLI: af deploy / UI deploy
+    User->>CLI: af sites deploy --target icp
     CLI->>Auth: Authenticate
     Auth-->>CLI: JWT Token
     
-    CLI->>API: Deploy request + JWT
+    CLI->>API: Deploy request + JWT + target=icp
     API->>API: Validate token
-    API->>CLI: Choose deployment target
-    CLI->>User: Select: IPFS/Arweave/Filecoin/ICP
-    User->>CLI: Select ICP
     
-    CLI->>API: Create deployment record
     API->>DB: Create deployment record
+    DB-->>API: Deployment ID
     
-    CLI->>Storage: Upload files
+    CLI->>API: Upload site files
     
-    alt ICP Deployment
-        Storage->>Storage: Create asset canister
-        Storage->>Storage: Upload to canister
-        Storage-->>CLI: Return canister ID
-    else IPFS/Arweave
-        Storage-->>CLI: Return CID/hash
+    alt ICP Target
+        API->>Storage: Create asset canister
+        Storage->>Storage: Deploy files to canister
+        Storage-->>API: Return canister ID
+        API->>DB: Save canister ID
+    else IPFS/Arweave/Filecoin
+        API->>Storage: Upload to storage
+        Storage-->>API: Return CID/hash
+        API->>DB: Save CID/hash
     end
     
-    CLI->>API: Update with canister ID/CID
-    API->>DB: Save metadata
-    API->>DB: Update deployment status
-    
+    API->>DB: Update deployment status: complete
     API-->>CLI: Deployment complete
-    CLI-->>User: Success
+    CLI-->>User: Success: canister-id.ic0.app
     
     User->>Gateway: Access site
-    
-    alt ICP Site
-        Gateway->>Storage: Fetch from canister
-        Storage-->>Gateway: Return files
-    else IPFS/Arweave Site
-        Gateway->>Storage: Fetch content (CID)
-        Storage-->>Gateway: Return files
-    end
-    
+    Gateway->>Storage: Fetch from canister/IPFS
+    Storage-->>Gateway: Return files
     Gateway-->>User: Render site
     
     rect rgba(197, 240, 255, 0.3)
@@ -793,7 +767,7 @@ sequenceDiagram
 
 ## User Flows
 
-This section outlines the complete user journey for common platform tasks, from initial onboarding to deploying sites, functions, containers, and AI agents, **including Internet Computer deployment options**.
+This section outlines the complete user journey for common platform tasks, from initial onboarding to deploying sites, functions, containers, and AI agents, **with Internet Computer as a deployment target option**.
 
 ### 1. User Onboarding and Authentication (with Internet Identity)
 
@@ -893,7 +867,7 @@ flowchart TD
 6. Optional first project setup
 7. Access to dashboard
 
-### 2. Site Deployment User Journey (with ICP Option)
+### 2. Site Deployment User Journey (with ICP Target)
 
 ```mermaid
 flowchart TD
@@ -923,7 +897,7 @@ flowchart TD
     WebUpload -->|Template| WebSelectTemplate[Choose Template]
     
     CLIReady --> CLINavigate[Navigate to Project]
-    CLINavigate --> CLICommand[Run: af deploy]
+    CLINavigate --> CLICommand[Run: af sites deploy]
     CLICommand --> CLIDetect[Detect Framework]
     
     SDKReady --> SDKCode[Write Deployment Code]
@@ -941,21 +915,20 @@ flowchart TD
     BuildSettings --> Framework{Framework Detected?}
     Framework -->|Yes| AutoConfig[Auto-Configure Build]
     Framework -->|No| ManualConfig[Manual Configuration]
-    AutoConfig --> ChooseStorage
-    ManualConfig --> ChooseStorage
+    AutoConfig --> ChooseTarget
+    ManualConfig --> ChooseTarget
     
-    ChooseStorage{Choose Storage}
-    ChooseStorage -->|IPFS| IPFSSettings[IPFS Settings]
-    ChooseStorage -->|Arweave| ArweaveSettings[Arweave Settings]
-    ChooseStorage -->|Filecoin| FilecoinSettings[Filecoin Settings]
-    ChooseStorage -->|Internet Computer| ICPSettings[ICP Canister Settings]
+    ChooseTarget{Choose Deployment Target<br/>--target flag}
+    ChooseTarget -->|--target ipfs| IPFSSettings[IPFS Settings]
+    ChooseTarget -->|--target arweave| ArweaveSettings[Arweave Settings]
+    ChooseTarget -->|--target filecoin| FilecoinSettings[Filecoin Settings]
+    ChooseTarget -->|--target icp| ICPSettings[ICP Settings]
     
     IPFSSettings --> DomainSetup
     ArweaveSettings --> DomainSetup
     FilecoinSettings --> DomainSetup
-    ICPSettings --> ICPConfig[Configure Canister]
     
-    ICPConfig --> ICPCycles[Allocate Cycles]
+    ICPSettings --> ICPCycles[Allocate Cycles]
     ICPCycles --> ICPSubnet[Select Subnet]
     ICPSubnet --> DomainSetup
     
@@ -980,16 +953,14 @@ flowchart TD
     FixBuild -->|Yes| BuildSettings
     FixBuild -->|No| Cancelled([Deployment Cancelled])
     
-    BuildSuccess -->|Yes| Upload[Upload to Storage]
-    Upload --> ProcessFiles[Process Files]
-    ProcessFiles --> DeployTarget{Deployment Target}
+    BuildSuccess -->|Yes| UploadTarget{Deployment Target}
     
-    DeployTarget -->|IPFS/Arweave/Filecoin| GenerateCID[Generate CID/Hash]
-    DeployTarget -->|ICP| CreateCanister[Create Asset Canister]
-    
+    UploadTarget -->|IPFS/Arweave/Filecoin| UploadTraditional[Upload to Storage]
+    UploadTraditional --> GenerateCID[Generate CID/Hash]
     GenerateCID --> PinContent[Pin Content]
     PinContent --> UpdateDB
     
+    UploadTarget -->|ICP| CreateCanister[Create Asset Canister]
     CreateCanister --> UploadToCanister[Upload to Canister]
     UploadToCanister --> GetCanisterID[Get Canister ID]
     GetCanisterID --> UpdateDB
@@ -1032,7 +1003,6 @@ flowchart TD
     style Complete fill:#e1e5f5
     style BuildError fill:#ffe1e1
     style ICPSettings fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
-    style ICPConfig fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
     style ICPCycles fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
     style ICPSubnet fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
     style ICPDomain fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
@@ -1045,8 +1015,8 @@ flowchart TD
 1. Choose deployment method (Web UI, CLI, or SDK)
 2. Authenticate and access deployment interface
 3. Configure build settings and framework detection
-4. **NEW: Select storage backend including Internet Computer option**
-5. **NEW: For ICP - configure canister, allocate cycles, select subnet**
+4. **NEW: Select deployment target with `--target` flag (ipfs|arweave|filecoin|icp)**
+5. **For ICP target: Configure canister, allocate cycles, select subnet**
 6. Set up domain (custom, subdomain, default, **or ICP native .ic0.app**)
 7. Build and upload process
 8. **For ICP: Create asset canister and upload directly**
@@ -1054,40 +1024,268 @@ flowchart TD
 10. Configure gateway and DNS
 11. Monitor and manage deployment
 
-### 3. Function Deployment Flow (with ICP Canister Option)
+### 3. Function Deployment Flow (with ICP Target)
 
-_[Full flowchart continues with ICP additions highlighted in light blue]_
+```mermaid
+flowchart TD
+    Start([Deploy Function]) --> Method{Method}
+    
+    Method -->|CLI| CLICmd[af functions deploy]
+    Method -->|Web UI| WebUI[Dashboard Functions]
+    Method -->|SDK| SDKCall[SDK Deploy Call]
+    
+    CLICmd --> SelectTarget{Select Target<br/>--target flag}
+    WebUI --> SelectTarget
+    SDKCall --> SelectTarget
+    
+    SelectTarget -->|--target akash| AkashPath[Akash Deployment]
+    SelectTarget -->|--target icp| ICPPath[ICP Canister Deployment]
+    
+    AkashPath --> ConfigAkash[Configure Akash Runtime]
+    ConfigAkash --> UploadIPFS[Upload Code to IPFS]
+    UploadIPFS --> DeployAkash[Deploy Container to Akash]
+    DeployAkash --> AkashURL[Get Function URL]
+    
+    ICPPath --> ConfigICP[Configure Canister]
+    ConfigICP --> AllocCycles[Allocate Cycles]
+    AllocCycles --> CompileWasm[Compile to Wasm]
+    CompileWasm --> DeployCanister[Deploy to ICP]
+    DeployCanister --> ICPURL[Get Canister URL]
+    
+    AkashURL --> Complete[Function Active]
+    ICPURL --> Complete
+    Complete --> End([Deployment Complete])
+    
+    style Start fill:#e1f5e1
+    style End fill:#e1f5e1
+    style ICPPath fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style ConfigICP fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style AllocCycles fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style CompileWasm fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style DeployCanister fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style ICPURL fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+```
+
+**Key Steps**:
+1. Choose deployment method (CLI, Web UI, SDK)
+2. **NEW: Select target with `--target akash` or `--target icp`**
+3. **For ICP: Configure canister, allocate cycles, compile to Wasm**
+4. Deploy to selected platform
+5. Get function endpoint URL
 
 ### 4. Container Registry User Flow
 
-_[Same as before - no ICP changes for container registry]_
+_[Container registry flow remains unchanged - no ICP integration]_
 
-### 5. AI Agent Deployment Flow (with ICP Canister Option)
+### 5. AI Agent Deployment Flow (with ICP Target)
 
-_[Full flowchart continues with ICP additions highlighted in light blue]_
+```mermaid
+flowchart TD
+    Start([Deploy AI Agent]) --> Method{Method}
+    
+    Method -->|CLI| CLICmd[af agents deploy]
+    Method -->|Web UI| WebUI[Dashboard Agents]
+    Method -->|SDK| SDKCall[SDK Deploy Call]
+    
+    CLICmd --> ConfigAgent[Configure Agent]
+    WebUI --> ConfigAgent
+    SDKCall --> ConfigAgent
+    
+    ConfigAgent --> SelectModel[Select AI Model]
+    SelectModel --> SelectTarget{Select Target<br/>--target flag}
+    
+    SelectTarget -->|--target akash| AkashPath[Akash Deployment]
+    SelectTarget -->|--target icp| ICPPath[ICP Canister Deployment]
+    
+    AkashPath --> AkashContainer[Deploy Agent Container]
+    AkashContainer --> AkashEndpoint[Get Agent Endpoint]
+    
+    ICPPath --> ICPCanister[Deploy Agent Canister]
+    ICPCanister --> ICPAllocate[Allocate Cycles]
+    ICPAllocate --> ICPEndpoint[Get Canister Endpoint]
+    
+    AkashEndpoint --> Complete[Agent Active]
+    ICPEndpoint --> Complete
+    Complete --> End([Deployment Complete])
+    
+    style Start fill:#e1f5e1
+    style End fill:#e1f5e1
+    style ICPPath fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style ICPCanister fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style ICPAllocate fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+    style ICPEndpoint fill:#c5f0ff,stroke:#0066cc,stroke-width:3px
+```
+
+**Key Steps**:
+1. Choose deployment method
+2. Configure agent and select AI model
+3. **NEW: Select target platform (akash or icp)**
+4. Deploy to selected platform
+5. **For ICP: Allocate cycles for agent operation**
+6. Get agent endpoint
 
 ### 6. Billing and Subscription Management Flow
 
-_[Same as before - billing flow remains unchanged]_
+_[Billing flow remains unchanged]_
 
 ---
 
-_[Rest of document continues with all previous content including Technology Stack, Repository Map, Security Architecture, Deployment Architecture, Integration Points, Scalability, Future Enhancements, References, and Glossary sections]_
+## Technology Stack
+
+### Backend
+- **Runtime**: Node.js 20+
+- **Framework**: GraphQL Yoga, Hono
+- **ORM**: Prisma
+- **Database**: PostgreSQL, SQLite
+- **Storage**: IPFS (Kubo), Arweave (Turbo SDK), Filecoin, **ICP (Agent SDK)**
+- **Auth**: JWT, SIWE, OAuth, **Internet Identity**
+- **Billing**: Stripe
+- **Deployment**: Akash Network, **Internet Computer**
+
+### Frontend
+- **Framework**: Next.js 16 + React 19
+- **UI Library**: Radix UI
+- **Styling**: Tailwind CSS 4
+- **State**: react-tracked
+- **Icons**: Lucide React
+- **Diagrams**: @xyflow/react
+- **i18n**: next-intl
+- **Theme**: next-themes
+
+### CLI & SDK
+- **CLI**: Commander.js, **dfx (ICP CLI)**
+- **SDK**: TypeScript, **ICP Agent SDK**
+- **Testing**: Vitest
+- **Linting**: Biome, ESLint
+- **Formatting**: Prettier, Biome
+
+### Infrastructure
+- **Compute**: Akash Network
+- **Blockchain**: **Internet Computer**
+- **Proxy**: Pingap (Pingora-based)
+- **DNS**: Cloudflare, Google DNS, deSEC (OctoDNS)
+- **Secrets**: Infisical
+- **Monitoring**: TBD
+
+### Storage Backends
+- **IPFS**: Content-addressed storage
+- **Arweave**: Permanent storage
+- **Filecoin**: Decentralized storage network
+- **Internet Computer**: Canister storage with stable memory
+
+---
+
+## Repository Map
+
+| Repository | Purpose | Primary Language |
+|------------|---------|-----------------|
+| `service-cloud-api` | Main GraphQL API | TypeScript |
+| `service-auth` | Authentication service | TypeScript |
+| `web-app.alternatefutures.ai` | Web dashboard | TypeScript (React) |
+| `package-cloud-cli` | CLI tool | TypeScript |
+| `package-cloud-sdk` | JavaScript SDK | TypeScript |
+| `web-docs.alternatefutures.ai` | Documentation | Markdown (VitePress) |
+| `web-alternatefutures.ai` | Company website | Astro |
+| `infrastructure-proxy` | SSL proxy (Pingap) | SDL (Akash) |
+| `service-secrets` | Secrets management | SDL (Akash) |
+| `infrastructure-dns` | DNS management | YAML (OctoDNS) |
+| `admin` | Admin tools & scripts | TypeScript |
+| `.github` | GitHub org config | Markdown |
+
+---
+
+## Security Architecture
+
+### Authentication Layers
+
+1. **User Authentication**:
+   - Email magic links
+   - SMS OTP
+   - Web3 wallets (SIWE)
+   - **Internet Identity (ICP)**
+   - Social OAuth
+   - Account linking
+
+2. **API Authentication**:
+   - JWT tokens
+   - Personal Access Tokens
+   - OAuth tokens
+   - **ICP Principal IDs**
+
+3. **Service Authentication**:
+   - Service-to-service JWT
+   - API keys
+   - **ICP canister authentication**
+
+### Data Security
+
+- **At Rest**: PostgreSQL encryption, IPFS content addressing, **ICP canister sandboxing**
+- **In Transit**: TLS 1.3 for all connections
+- **Secrets**: Infisical for centralized management
+- **Functions**: Optional SGX for encrypted execution (Akash), **ICP canister security model**
+
+### Access Control
+
+- Role-Based Access Control (RBAC)
+- Project-level permissions
+- API key scoping
+- **ICP canister access control**
+
+---
+
+## Deployment Architecture
+
+### Multi-Platform Strategy
+
+The platform supports multiple deployment targets for resilience and flexibility:
+
+| Service Type | Akash | ICP | IPFS | Arweave | Filecoin |
+|--------------|-------|-----|------|---------|----------|
+| Static Sites | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Functions | ✅ | ✅ | ❌ | ❌ | ❌ |
+| AI Agents | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Storage | ❌ | ✅ | ✅ | ✅ | ✅ |
+
+### Deployment Decision Matrix
+
+**Use IPFS when**:
+- Fast content delivery needed
+- Content updates are frequent
+- Cost optimization is priority
+
+**Use Arweave when**:
+- Permanent storage required
+- Content is immutable
+- Long-term archival needed
+
+**Use Filecoin when**:
+- Large file storage needed
+- Decentralized storage network required
+- Verified storage proofs needed
+
+**Use ICP when**:
+- Backend logic required (functions/agents)
+- Automatic scaling needed
+- Native blockchain integration required
+- Decentralized compute preferred
+
+**Use Akash when**:
+- Container-based deployment needed
+- Full control over runtime environment
+- SGX encrypted execution required
 
 ---
 
 **Last Updated**: 2026-01-27  
-**Version**: 4.0.0 (Internet Computer Integration)  
+**Version**: 4.1.0 (ICP as Deployment Target)  
 **Maintainers**: Alternate Futures Team
 
-**Changes in v4.0.0**:
-- ✨ Added Internet Computer (ICP) integration across all architecture layers
-- ✨ Added ICP as deployment platform option for sites, functions, and agents
-- ✨ Integrated Internet Identity for authentication
-- ✨ Added ICP canister storage and stable memory options
-- ✨ Updated all user flows to include ICP deployment paths
-- 🎨 Highlighted all ICP additions with light blue color (#c5f0ff) for easy identification
-- 📘 Added prominent visual identifier at document top
-- 📚 Added ICP-specific documentation and glossary terms
-- 🔄 Updated technology stack with ICP Agent SDK and dfx CLI
-- 🌐 Enhanced multi-platform deployment architecture
+**Changes in v4.1.0**:
+- 🔄 **BREAKING**: Refactored ICP integration to be a deployment target option rather than separate backend service
+- ✨ Simplified architecture: ICP is now accessed via `--target icp` flag in CLI
+- ✨ Updated all diagrams to show ICP as one of multiple deployment options
+- ✨ Removed ICP Gateway Service and ICP Canisters Backend Services from architecture
+- ✨ Integrated ICP Agent SDK directly into GraphQL API service
+- 📘 Maintained all ICP visual highlighting (light blue #c5f0ff) for consistency
+- 🎯 Clarified deployment decision matrix with ICP as a peer to Akash/IPFS/Arweave/Filecoin
+- 📚 Updated technology stack to reflect ICP as a deployment platform
