@@ -29,10 +29,10 @@ This file tracks active deployments on Akash Network. All information here is pu
 ### infrastructure-proxy (SSL Proxy)
 | Field | Value |
 |-------|-------|
-| **DSEQ** | 25312670 |
-| **Provider** | DigitalFrontier (`akash1aaul837r7en7hpk9wv2svg8u78fdq0t2j2e82z`) |
+| **DSEQ** | 25413561 |
+| **Provider** | america.computer (`akash1zlsep362zz46qlwzttm06t8lv9qtg8gtaya97u`) |
 | **Image** | `ghcr.io/alternatefutures/infrastructure-proxy-pingap:main` |
-| **Dedicated IP** | 77.76.13.213 |
+| **Dedicated IP** | 198.12.74.90 |
 | **Domains Routed** | auth, api, app, docs.alternatefutures.ai |
 | **Status** | Running |
 
@@ -53,16 +53,16 @@ This file tracks active deployments on Akash Network. All information here is pu
 
 ## Infrastructure & SSL
 
-All custom domains route through the SSL proxy (Pingap on Cloudflare's Pingora framework) at `77.76.13.213`, **except** `secrets.alternatefutures.ai` which connects directly to its Akash deployment for resilience.
+All custom domains route through the SSL proxy (Pingap on Cloudflare's Pingora framework) at `198.12.74.90`, **except** `secrets.alternatefutures.ai` which connects directly to its Akash deployment for resilience.
 
 | Domain | Routing | SSL |
 |--------|---------|-----|
-| auth.alternatefutures.ai | SSL proxy (77.76.13.213) | Cloudflare Origin Cert |
-| api.alternatefutures.ai | SSL proxy (77.76.13.213) | Cloudflare Origin Cert |
+| auth.alternatefutures.ai | SSL proxy (198.12.74.90) | Cloudflare Origin Cert |
+| api.alternatefutures.ai | SSL proxy (198.12.74.90) | Cloudflare Origin Cert |
 | app.alternatefutures.ai | Vercel | Vercel managed |
 | secrets.alternatefutures.ai | Direct to Akash | Cloudflare proxy |
-| yb.alternatefutures.ai | SSL proxy (77.76.13.213) | Cloudflare Origin Cert |
-| ipfs.alternatefutures.ai | SSL proxy (77.76.13.213) | Cloudflare Origin Cert |
+| yb.alternatefutures.ai | SSL proxy (198.12.74.90) | Cloudflare Origin Cert |
+| ipfs.alternatefutures.ai | SSL proxy (198.12.74.90) | Cloudflare Origin Cert |
 
 ## Quick Reference: DSEQ to Service
 
@@ -70,7 +70,7 @@ All custom domains route through the SSL proxy (Pingap on Cloudflare's Pingora f
 |------|---------|-------------|
 | 25411473 | service-cloud-api (full stack) | api.alternatefutures.ai |
 | 25412621 | service-auth | auth.alternatefutures.ai |
-| 25312670 | infrastructure-proxy (SSL) | 77.76.13.213 |
+| 25413561 | infrastructure-proxy (SSL) | 198.12.74.90 |
 | 25354545 | Infisical Secrets | secrets.alternatefutures.ai |
 
 > **Note:** Akash Console shows deployments as "Unknown" since SDL naming is not supported.
@@ -81,7 +81,7 @@ All custom domains route through the SSL proxy (Pingap on Cloudflare's Pingora f
 |----------|------|----------|
 | `akash1kqzpqqhm39umt06wu8m4hx63v5hefhrfmjf9dj` | leet.haus | service-cloud-api |
 | `akash1xmjzu9dczlg9fa4v3pfvwzn7ty89r003laj4ac` | tagus.host | service-auth |
-| `akash1aaul837r7en7hpk9wv2svg8u78fdq0t2j2e82z` | DigitalFrontier | SSL proxy |
+| `akash1zlsep362zz46qlwzttm06t8lv9qtg8gtaya97u` | america.computer | SSL proxy |
 | `akash18ga02jzaq8cw52anyhzkwta5wygufgu6zsz6xc` | Europlots | Infisical (BLOCKED for other services — NAT hairpin) |
 
 ## Blocked Providers
