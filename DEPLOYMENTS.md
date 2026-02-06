@@ -4,50 +4,45 @@ This file tracks active deployments on Akash Network. All information here is pu
 
 ## Active Deployments
 
-### IPFS Node (Kubo)
+### service-cloud-api (Full Stack)
 | Field | Value |
 |-------|-------|
-| **dseq** | 24642352 |
-| **Provider** | Europlots |
-| **Image** | ipfs/kubo:v0.27.0 |
-| **API URL** | `http://provider.europlots.com:30670` |
-| **Gateway URL** | `http://provider.europlots.com:32160` |
-| **Swarm Port** | `provider.europlots.com:30951` |
-| **Peer ID** | `12D3KooWHvattdgfMSsEvi93hYjpp5ixkr7ZFQfsBN8soHPLy7wV` |
-| **Resources** | 2 CPU, 4GB RAM, 100GB persistent storage |
-| **Cost** | ~32 uakt/block (~$2.50/month) |
+| **DSEQ** | 25411473 |
+| **Provider** | `akash1kqzpqqhm39umt06wu8m4hx63v5hefhrfmjf9dj` (leet.haus) |
+| **Services** | API + YugabyteDB + IPFS + Jaeger + OTel Collector |
+| **Custom Domains** | api.alternatefutures.ai, yb.alternatefutures.ai, ipfs.alternatefutures.ai |
+| **Resources** | 8 CPU, 20Gi RAM, 280Gi storage |
 | **Status** | Running |
-
-#### Pinned Content
-| Site | CID |
-|------|-----|
-| web-docs | `QmeQe1QuyiAiyCrJLASixPtH2VW6xQZxcpqCHJsUTtxfUR` |
-| web-app | `QmU4VRKexpuA6RvYfXY9nUsgiHRMLDhxvZFi7ssGHn3aHj` |
-
-### service-cloud-api (GraphQL API)
-| Field | Value |
-|-------|-------|
-| **dseq** | 24363709 |
-| **Provider** | Europlots |
-| **Ingress URL** | `cjrdmusuql9e34bevi8mjgj8pg.ingress.europlots.com` |
-| **Custom Domain** | api.alternatefutures.ai |
-| **Status** | Running |
+| **CI/CD** | `deploy-akash.yml` (full) / `update-manifest.yml` (in-place) |
 
 ### service-auth (Authentication)
 | Field | Value |
 |-------|-------|
-| **dseq** | 24562739 |
-| **Provider** | Europlots |
-| **Ingress URL** | `ubsm31q4ol97b1pi5l06iognug.ingress.europlots.com` |
-| **Custom Domain** | auth.alternatefutures.ai |
+| **DSEQ** | 25412621 |
+| **Provider** | `akash1xmjzu9dczlg9fa4v3pfvwzn7ty89r003laj4ac` (tagus.host) |
+| **Image** | `ghcr.io/alternatefutures/service-auth:main-*` |
+| **Custom Domain** | auth.alternatefutures.ai (via SSL proxy) |
+| **Resources** | 1 CPU, 1Gi RAM, 1Gi storage |
 | **Status** | Running |
+| **CI/CD** | `deploy-akash.yml` (full) / `update-manifest.yml` (in-place) |
 
-### Infisical (Secrets Manager)
+### infrastructure-proxy (SSL Proxy)
 | Field | Value |
 |-------|-------|
-| **dseq** | 24352697 |
-| **Provider** | akash1u5cdg7k3gl43mukca4aeultuz8x2j68mgwn28e |
-| **Custom Domain** | secrets.alternatefutures.ai |
+| **DSEQ** | 25312670 |
+| **Provider** | DigitalFrontier (`akash1aaul837r7en7hpk9wv2svg8u78fdq0t2j2e82z`) |
+| **Image** | `ghcr.io/alternatefutures/infrastructure-proxy-pingap:main` |
+| **Dedicated IP** | 77.76.13.213 |
+| **Domains Routed** | auth, api, app, docs.alternatefutures.ai |
+| **Status** | Running |
+
+### Infisical Secrets Manager
+| Field | Value |
+|-------|-------|
+| **DSEQ** | 25354545 |
+| **Provider** | Europlots (`akash18ga02jzaq8cw52anyhzkwta5wygufgu6zsz6xc`) |
+| **Ingress** | `uvhirubqe1aa1att76elejdi3c.ingress.europlots.com` |
+| **Custom Domain** | secrets.alternatefutures.ai (direct, not through proxy) |
 | **Status** | Running |
 
 ## Akash Account
@@ -56,38 +51,45 @@ This file tracks active deployments on Akash Network. All information here is pu
 - **Network**: Mainnet
 - **Explorer**: [Cloudmos](https://deploy.cloudmos.io/addresses/akash1degudmhf24auhfnqtn99mkja3xt7clt9um77tn)
 
-## Infrastructure Status
+## Infrastructure & SSL
 
-| Service | Domain/Endpoint | SSL | Status |
-|---------|-----------------|-----|--------|
-| GraphQL API | api.alternatefutures.ai | Provider cert | Active |
-| Auth Service | auth.alternatefutures.ai | Provider cert | Active |
-| Secrets Manager | secrets.alternatefutures.ai | Provider cert | Active |
-| IPFS API | provider.europlots.com:30670 | - | Active |
-| IPFS Gateway | provider.europlots.com:32160 | - | Active |
+All custom domains route through the SSL proxy (Pingap on Cloudflare's Pingora framework) at `77.76.13.213`, **except** `secrets.alternatefutures.ai` which connects directly to its Akash deployment for resilience.
 
-## DNS Configuration
+| Domain | Routing | SSL |
+|--------|---------|-----|
+| auth.alternatefutures.ai | SSL proxy (77.76.13.213) | Cloudflare Origin Cert |
+| api.alternatefutures.ai | SSL proxy (77.76.13.213) | Cloudflare Origin Cert |
+| app.alternatefutures.ai | Vercel | Vercel managed |
+| secrets.alternatefutures.ai | Direct to Akash | Cloudflare proxy |
+| yb.alternatefutures.ai | SSL proxy (77.76.13.213) | Cloudflare Origin Cert |
+| ipfs.alternatefutures.ai | SSL proxy (77.76.13.213) | Cloudflare Origin Cert |
 
-| Domain | Record Type | Value |
-|--------|-------------|-------|
-| api.alternatefutures.ai | A | 170.75.255.101 |
-| auth.alternatefutures.ai | A | 86.33.22.194 |
-| secrets.alternatefutures.ai | A | 170.75.255.101 |
+## Quick Reference: DSEQ to Service
+
+| DSEQ | Service | Primary URL |
+|------|---------|-------------|
+| 25411473 | service-cloud-api (full stack) | api.alternatefutures.ai |
+| 25412621 | service-auth | auth.alternatefutures.ai |
+| 25312670 | infrastructure-proxy (SSL) | 77.76.13.213 |
+| 25354545 | Infisical Secrets | secrets.alternatefutures.ai |
+
+> **Note:** Akash Console shows deployments as "Unknown" since SDL naming is not supported.
 
 ## Provider Reference
 
-| Provider | Address | Region |
-|----------|---------|--------|
-| Europlots | `akash18ga02jzaq8cw52anyhzkwta5wygufgu6zsz6xc` | EU |
-| Spheron | `akash1u5cdg7k3gl43mukca4aeultuz8x2j68mgwn28e` | - |
+| Provider | Name | Used For |
+|----------|------|----------|
+| `akash1kqzpqqhm39umt06wu8m4hx63v5hefhrfmjf9dj` | leet.haus | service-cloud-api |
+| `akash1xmjzu9dczlg9fa4v3pfvwzn7ty89r003laj4ac` | tagus.host | service-auth |
+| `akash1aaul837r7en7hpk9wv2svg8u78fdq0t2j2e82z` | DigitalFrontier | SSL proxy |
+| `akash18ga02jzaq8cw52anyhzkwta5wygufgu6zsz6xc` | Europlots | Infisical (BLOCKED for other services — NAT hairpin) |
 
-## Environment Variables
+## Blocked Providers
 
-```bash
-# IPFS Node
-IPFS_API_URL=http://provider.europlots.com:30670
-IPFS_GATEWAY_URL=http://provider.europlots.com:32160
-```
+| Provider | Reason |
+|----------|--------|
+| `akash18ga02jzaq8cw52anyhzkwta5wygufgu6zsz6xc` | Europlots — SSL proxy historically ran here; NAT hairpin issue |
+| `akash1smapjx8m8363nmdvc2yr9atlqy8vcql73m9l0v` | Broken hostname |
 
 ## View Deployments
 
@@ -98,4 +100,4 @@ https://deploy.cloudmos.io/deployment/akash1degudmhf24auhfnqtn99mkja3xt7clt9um77
 
 ---
 
-*Last updated: 2025-12-15*
+*Last updated: 2026-02-06*
