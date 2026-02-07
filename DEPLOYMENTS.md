@@ -24,10 +24,11 @@ This file tracks active deployments on Akash Network. All information here is pu
 ### api
 | Field | Value |
 |-------|-------|
-| **DSEQ** | 25423196 |
-| **Provider** | `akash1q4nsecnmxh9rmdyvlfx3nt654nkgp628yuy8sg` |
+| **DSEQ** | 25424305 |
+| **Provider** | `akash1v4mngfecem3xz0lqyr054na5g49andmyvnyykk` (cap-test-compute.com) |
 | **Image** | `ghcr.io/alternatefutures/service-cloud-api:latest` |
 | **Custom Domain** | api.alternatefutures.ai (via SSL proxy) |
+| **Ingress** | `v05pq98qm5a6faj4g0sse1hp4o.ingress.cap-test-compute.com` |
 | **Status** | Running |
 | **CI/CD** | `deploy-akash.yml` (full) / `update-manifest.yml` (in-place) |
 
