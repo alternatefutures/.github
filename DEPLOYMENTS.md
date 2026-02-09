@@ -18,7 +18,7 @@ This file tracks active deployments on Akash Network. All information here is pu
 | **DSEQ** | 25423172 |
 | **Provider** | `akash1k94uya5rhrtj9rfw850az9aq2d6vdpjmtnlgd0` |
 | **Services** | IPFS + Jaeger (OTel collector disabled) |
-| **Custom Domains** | ipfs.alternatefutures.ai, jaeger.alternatefutures.ai |
+| **Ingress** | See Cloudmos for provider ingress URIs (custom-domain routing depends on `infrastructure-proxy/pingap.toml`) |
 | **Status** | Running |
 
 ### api
@@ -83,8 +83,8 @@ All custom domains route through the SSL proxy (Pingap on Cloudflare's Pingora f
 | auth.alternatefutures.ai | SSL proxy (198.12.74.90) | Cloudflare Origin Cert |
 | api.alternatefutures.ai | SSL proxy (198.12.74.90) | Cloudflare Origin Cert |
 | app.alternatefutures.ai | Vercel | Vercel managed |
-| ipfs.alternatefutures.ai | SSL proxy (198.12.74.90) | Cloudflare Origin Cert |
-| jaeger.alternatefutures.ai | SSL proxy (198.12.74.90) | Cloudflare Origin Cert |
+| ipfs.alternatefutures.ai | TBD (data services deployment) | TBD |
+| jaeger.alternatefutures.ai | TBD (data services deployment) | TBD |
 
 ## Blocked Providers
 
