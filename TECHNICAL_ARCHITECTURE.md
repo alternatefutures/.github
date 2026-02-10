@@ -2273,7 +2273,7 @@ graph LR
 
 - `admin/CLAUDE.md` - Repository structure and development guide
 - `admin/infrastructure/deployments.ts` - Akash deployment configuration
-- `.github/DEPLOYMENTS.md` - Deployment tracking
+- `DEPLOYMENTS.md` - Deployment tracking (canonical)
 - `.github/CONTRIBUTING.md` - Contribution guidelines
 
 ---
