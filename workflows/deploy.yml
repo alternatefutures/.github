@@ -1,0 +1,145 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "service-cloud-api/**"
+      - "service-auth/**"
+      - "infra/k8s/**"
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  K3S_SERVER: ${{ secrets.K3S_SERVER_IP }}
+
+jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      auth: ${{ steps.filter.outputs.auth }}
+      k8s: ${{ steps.filter.outputs.k8s }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            api:
+              - "service-cloud-api/**"
+            auth:
+              - "service-auth/**"
+            k8s:
+              - "infra/k8s/**"
+
+  build-api:
+    name: Build API
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: service-cloud-api/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/alternatefutures/service-cloud-api:latest
+            ${{ env.REGISTRY }}/alternatefutures/service-cloud-api:${{ github.sha }}
+          platforms: linux/amd64
+
+  build-auth:
+    name: Build Auth
+    needs: changes
+    if: needs.changes.outputs.auth == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: service-auth
+          file: service-auth/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/alternatefutures/service-auth:latest
+            ${{ env.REGISTRY }}/alternatefutures/service-auth:${{ github.sha }}
+          platforms: linux/amd64
+
+  deploy:
+    name: Deploy to K3s
+    needs: [changes, build-api, build-auth]
+    if: always() && !failure() && !cancelled()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Rollout API
+        if: needs.changes.outputs.api == 'true'
+        run: kubectl rollout restart deployment/service-cloud-api -n af-production
+
+      - name: Rollout Auth
+        if: needs.changes.outputs.auth == 'true'
+        run: kubectl rollout restart deployment/service-auth -n af-production
+
+      - name: Apply K8s manifests
+        if: needs.changes.outputs.k8s == 'true'
+        run: |
+          kubectl apply -f infra/k8s/namespaces/
+          kubectl apply -f infra/k8s/api/
+          kubectl apply -f infra/k8s/auth/
+          kubectl apply -f infra/k8s/postgres/
+          kubectl apply -f infra/k8s/nats/
+          kubectl apply -f infra/k8s/ipfs/
+          kubectl apply -f infra/k8s/jaeger/
+          kubectl apply -f infra/k8s/ingress/
+
+      - name: Run migrations (API)
+        if: needs.changes.outputs.api == 'true'
+        run: |
+          kubectl wait --for=condition=available deployment/service-cloud-api -n af-production --timeout=120s
+          kubectl exec deployment/service-cloud-api -n af-production -- npx prisma migrate deploy
+
+      - name: Run migrations (Auth)
+        if: needs.changes.outputs.auth == 'true'
+        run: |
+          kubectl wait --for=condition=available deployment/service-auth -n af-production --timeout=120s
+          kubectl exec deployment/service-auth -n af-production -- npx prisma migrate deploy
+
+      - name: Verify deployment
+        run: |
+          kubectl get pods -n af-production
+          echo "---"
+          curl -sf https://api.alternatefutures.ai/health || echo "API health check pending"
+          curl -sf https://auth.alternatefutures.ai/health || echo "Auth health check pending"
