@@ -73,7 +73,7 @@ jobs:
 
           # Build fields array
           FIELDS="["
-          FIELDS+='{"name":"service-cloud-api","value":"Status: `${{ steps.api.outputs.http_code }}` | ${${{ steps.api.outputs.response_ms }}}ms","inline":true},'
+          FIELDS+='{"name":"service-cloud-api","value":"Status: `${{ steps.api.outputs.http_code }}` | ${{ steps.api.outputs.response_ms }}ms","inline":true},'
           FIELDS+='{"name":"service-auth","value":"Status: `${{ steps.auth.outputs.http_code }}` | ${{ steps.auth.outputs.response_ms }}ms","inline":true},'
           FIELDS+='{"name":"web-app","value":"Status: `${{ steps.app.outputs.http_code }}` | ${{ steps.app.outputs.response_ms }}ms","inline":true}'
           FIELDS+="]"
@@ -120,3 +120,9 @@ jobs:
           echo "| service-cloud-api | $API_ICON ${{ steps.api.outputs.status }} | \`${{ steps.api.outputs.http_code }}\` | ${{ steps.api.outputs.response_ms }}ms |" >> $GITHUB_STEP_SUMMARY
           echo "| service-auth | $AUTH_ICON ${{ steps.auth.outputs.status }} | \`${{ steps.auth.outputs.http_code }}\` | ${{ steps.auth.outputs.response_ms }}ms |" >> $GITHUB_STEP_SUMMARY
           echo "| web-app | $APP_ICON ${{ steps.app.outputs.status }} | \`${{ steps.app.outputs.http_code }}\` | ${{ steps.app.outputs.response_ms }}ms |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail if any service is unhealthy
+        if: steps.api.outputs.status == 'unhealthy' || steps.auth.outputs.status == 'unhealthy' || steps.app.outputs.status == 'unhealthy'
+        run: |
+          echo "::error::One or more services are unhealthy"
+          exit 1
