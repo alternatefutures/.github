@@ -1,0 +1,122 @@
+name: Health Check & Alerting
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"  # Every 5 minutes
+  workflow_dispatch:
+
+env:
+  API_URL: https://api.alternatefutures.ai/health
+  AUTH_URL: https://auth.alternatefutures.ai/health
+  APP_URL: https://app.alternatefutures.ai
+
+jobs:
+  check-services:
+    name: Service Health Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check service-cloud-api
+        id: api
+        run: |
+          START=$(date +%s%3N)
+          HTTP_CODE=$(curl -sf -o /tmp/api_response -w "%{http_code}" --max-time 15 "$API_URL" 2>/dev/null) || HTTP_CODE="000"
+          END=$(date +%s%3N)
+          RESPONSE_MS=$((END - START))
+          BODY=$(cat /tmp/api_response 2>/dev/null || echo "no response")
+          echo "http_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+          echo "response_ms=$RESPONSE_MS" >> $GITHUB_OUTPUT
+          echo "body=$BODY" >> $GITHUB_OUTPUT
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "status=healthy" >> $GITHUB_OUTPUT
+          else
+            echo "status=unhealthy" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check service-auth
+        id: auth
+        run: |
+          START=$(date +%s%3N)
+          HTTP_CODE=$(curl -sf -o /tmp/auth_response -w "%{http_code}" --max-time 15 "$AUTH_URL" 2>/dev/null) || HTTP_CODE="000"
+          END=$(date +%s%3N)
+          RESPONSE_MS=$((END - START))
+          BODY=$(cat /tmp/auth_response 2>/dev/null || echo "no response")
+          echo "http_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+          echo "response_ms=$RESPONSE_MS" >> $GITHUB_OUTPUT
+          echo "body=$BODY" >> $GITHUB_OUTPUT
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "status=healthy" >> $GITHUB_OUTPUT
+          else
+            echo "status=unhealthy" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check web-app
+        id: app
+        run: |
+          START=$(date +%s%3N)
+          HTTP_CODE=$(curl -sf -o /dev/null -w "%{http_code}" --max-time 15 "$APP_URL" 2>/dev/null) || HTTP_CODE="000"
+          END=$(date +%s%3N)
+          RESPONSE_MS=$((END - START))
+          echo "http_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+          echo "response_ms=$RESPONSE_MS" >> $GITHUB_OUTPUT
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "status=healthy" >> $GITHUB_OUTPUT
+          else
+            echo "status=unhealthy" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Alert on failure (Discord)
+        if: steps.api.outputs.status == 'unhealthy' || steps.auth.outputs.status == 'unhealthy' || steps.app.outputs.status == 'unhealthy'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          # Build fields array
+          FIELDS="["
+          FIELDS+='{"name":"service-cloud-api","value":"Status: `${{ steps.api.outputs.http_code }}` | ${${{ steps.api.outputs.response_ms }}}ms","inline":true},'
+          FIELDS+='{"name":"service-auth","value":"Status: `${{ steps.auth.outputs.http_code }}` | ${{ steps.auth.outputs.response_ms }}ms","inline":true},'
+          FIELDS+='{"name":"web-app","value":"Status: `${{ steps.app.outputs.http_code }}` | ${{ steps.app.outputs.response_ms }}ms","inline":true}'
+          FIELDS+="]"
+
+          # Determine which services are down
+          DOWN=""
+          [ "${{ steps.api.outputs.status }}" = "unhealthy" ] && DOWN="${DOWN} service-cloud-api"
+          [ "${{ steps.auth.outputs.status }}" = "unhealthy" ] && DOWN="${DOWN} service-auth"
+          [ "${{ steps.app.outputs.status }}" = "unhealthy" ] && DOWN="${DOWN} web-app"
+
+          PAYLOAD=$(cat <<ENDJSON
+          {
+            "embeds": [{
+              "title": "🚨 Health Check FAILED",
+              "description": "**Down:**${DOWN}\n\n[View workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+              "color": 15548997,
+              "fields": $FIELDS,
+              "footer": {"text": "AlternateFutures Health Monitor"},
+              "timestamp": "$TIMESTAMP"
+            }]
+          }
+          ENDJSON
+          )
+
+          if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+            curl -sf -H "Content-Type: application/json" -d "$PAYLOAD" "$DISCORD_WEBHOOK_URL"
+            echo "Discord alert sent"
+          else
+            echo "::warning::DISCORD_WEBHOOK_URL not set — alert not sent"
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Health Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | Status | HTTP | Response Time |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|------|---------------|" >> $GITHUB_STEP_SUMMARY
+
+          API_ICON=$( [ "${{ steps.api.outputs.status }}" = "healthy" ] && echo "✅" || echo "❌" )
+          AUTH_ICON=$( [ "${{ steps.auth.outputs.status }}" = "healthy" ] && echo "✅" || echo "❌" )
+          APP_ICON=$( [ "${{ steps.app.outputs.status }}" = "healthy" ] && echo "✅" || echo "❌" )
+
+          echo "| service-cloud-api | $API_ICON ${{ steps.api.outputs.status }} | \`${{ steps.api.outputs.http_code }}\` | ${{ steps.api.outputs.response_ms }}ms |" >> $GITHUB_STEP_SUMMARY
+          echo "| service-auth | $AUTH_ICON ${{ steps.auth.outputs.status }} | \`${{ steps.auth.outputs.http_code }}\` | ${{ steps.auth.outputs.response_ms }}ms |" >> $GITHUB_STEP_SUMMARY
+          echo "| web-app | $APP_ICON ${{ steps.app.outputs.status }} | \`${{ steps.app.outputs.http_code }}\` | ${{ steps.app.outputs.response_ms }}ms |" >> $GITHUB_STEP_SUMMARY
