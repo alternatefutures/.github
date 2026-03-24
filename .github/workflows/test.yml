@@ -71,6 +71,46 @@ jobs:
       - name: Run tests with coverage
         run: ${{ inputs.test-command }}
 
+      - name: Extract coverage percentage
+        if: always()
+        id: coverage
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            TOTAL=$(node -e "const c = require('./coverage/coverage-summary.json'); console.log(Math.round(c.total.lines.pct))")
+            echo "pct=$TOTAL" >> $GITHUB_OUTPUT
+            if [ "$TOTAL" -ge 80 ]; then
+              echo "color=brightgreen" >> $GITHUB_OUTPUT
+            elif [ "$TOTAL" -ge 60 ]; then
+              echo "color=green" >> $GITHUB_OUTPUT
+            elif [ "$TOTAL" -ge 40 ]; then
+              echo "color=yellow" >> $GITHUB_OUTPUT
+            else
+              echo "color=red" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "pct=0" >> $GITHUB_OUTPUT
+            echo "color=red" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "![Coverage](https://img.shields.io/badge/coverage-${{ steps.coverage.outputs.pct }}%25-${{ steps.coverage.outputs.color }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f coverage/coverage-summary.json ]; then
+            node -e "
+              const c = require('./coverage/coverage-summary.json').total;
+              console.log('| Metric | Percentage |');
+              console.log('|--------|-----------|');
+              console.log('| Lines | ' + c.lines.pct + '% |');
+              console.log('| Functions | ' + c.functions.pct + '% |');
+              console.log('| Branches | ' + c.branches.pct + '% |');
+              console.log('| Statements | ' + c.statements.pct + '% |');
+            " >> $GITHUB_STEP_SUMMARY
+          fi
+
       - name: Upload coverage artifact
         if: always()
         uses: actions/upload-artifact@v4
