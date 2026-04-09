@@ -1,20 +1,22 @@
 <div align="center">
 
-# ☁️ Alternate Clouds
+# Alternate Futures
 
-**Deploy to decentralized compute. Pay less. Own more.**
-
-Launch containers, AI agents, and full-stack apps on decentralized infrastructure — from one dashboard or CLI.
+**Building the decentralized cloud.**
 
 [![Website](https://img.shields.io/badge/Website-alternatefutures.ai-0026FF?style=for-the-badge)](https://alternatefutures.ai)
-[![App](https://img.shields.io/badge/App-app.alternatefutures.ai-0026FF?style=for-the-badge)](https://app.alternatefutures.ai)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Us-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/GwHw3aBK)
 
 ---
 
 </div>
 
-## Quick Start
+## ☁️ Alternate Clouds
+
+Our flagship product. Deploy containers, AI agents, and full-stack apps to decentralized compute — from one dashboard or CLI. Pay less than traditional cloud. Own your infrastructure.
+
+[![App](https://img.shields.io/badge/Open-app.alternatefutures.ai-0026FF?style=flat-square)](https://app.alternatefutures.ai)
+[![npm](https://img.shields.io/npm/v/@alternatefutures/cli?style=flat-square)](https://www.npmjs.com/package/@alternatefutures/cli)
 
 ```bash
 npm install -g @alternatefutures/cli
@@ -22,36 +24,6 @@ af login
 af projects create --name my-project
 af services deploy
 ```
-
----
-
-## Repositories
-
-### Services
-
-| Repo | Description |
-|------|-------------|
-| [**service-auth**](https://github.com/alternatefutures/service-auth) | Authentication, billing, AI inference proxy |
-| [**service-cloud-api**](https://github.com/alternatefutures/service-cloud-api) | GraphQL API — compute orchestration, domains, templates |
-
-### Packages
-
-| Repo | Description |
-|------|-------------|
-| [**package-cloud-cli**](https://github.com/alternatefutures/package-cloud-cli) | CLI for deploying and managing services [![npm](https://img.shields.io/npm/v/@alternatefutures/cli?style=flat-square)](https://www.npmjs.com/package/@alternatefutures/cli) |
-| [**package-cloud-sdk**](https://github.com/alternatefutures/package-cloud-sdk) | TypeScript SDK for programmatic access [![npm](https://img.shields.io/npm/v/@alternatefutures/sdk?style=flat-square)](https://www.npmjs.com/package/@alternatefutures/sdk) |
-
-### Web
-
-| Repo | Description |
-|------|-------------|
-| [**web-app.alternatefutures.ai**](https://github.com/alternatefutures/web-app.alternatefutures.ai) | Dashboard (Next.js, Vercel) |
-| [**web-alternatefutures.ai**](https://github.com/alternatefutures/web-alternatefutures.ai) | Marketing website |
-| [**web-docs.alternatefutures.ai**](https://github.com/alternatefutures/web-docs.alternatefutures.ai) | Documentation site |
-
----
-
-## Why Alternate Clouds?
 
 <table>
 <tr>
@@ -86,14 +58,28 @@ CLI, SDK, GraphQL API, and a dashboard. Pick your workflow.
 
 ---
 
-## Tech Stack
+## Open Source Repositories
 
-- **Frontend**: Next.js, TypeScript, shadcn/ui, next-intl
-- **Backend**: Hono (auth), GraphQL Yoga (API), Prisma, PostgreSQL
-- **Compute**: Decentralized infrastructure (standard + confidential)
-- **Payments**: Stripe (subscriptions + credits wallet)
-- **Auth**: Email OTP, SMS, Web3/SIWE, OAuth (Google, GitHub, Discord, X)
-- **Infra**: Docker, K3s, OpenTofu, GitHub Actions
+### Services
+
+| Repo | Description |
+|------|-------------|
+| [**service-auth**](https://github.com/alternatefutures/service-auth) | Authentication, billing, AI inference proxy |
+| [**service-cloud-api**](https://github.com/alternatefutures/service-cloud-api) | GraphQL API — compute orchestration, domains, templates |
+
+### Packages
+
+| Repo | Description |
+|------|-------------|
+| [**package-cloud-cli**](https://github.com/alternatefutures/package-cloud-cli) | CLI for deploying and managing services |
+| [**package-cloud-sdk**](https://github.com/alternatefutures/package-cloud-sdk) | TypeScript SDK for programmatic access |
+
+### Web
+
+| Repo | Description |
+|------|-------------|
+| [**web-alternatefutures.ai**](https://github.com/alternatefutures/web-alternatefutures.ai) | Marketing website |
+| [**web-docs.alternatefutures.ai**](https://github.com/alternatefutures/web-docs.alternatefutures.ai) | Documentation site |
 
 ---
 
