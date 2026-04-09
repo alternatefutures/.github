@@ -98,6 +98,6 @@ Join our [Discord](https://discord.gg/GwHw3aBK) to chat with the team.
 
 **[Website](https://alternatefutures.ai)** · **[App](https://app.alternatefutures.ai)** · **[Discord](https://discord.gg/GwHw3aBK)**
 
-MIT License
+AGPL-3.0-only
 
 </div>
