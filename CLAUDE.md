@@ -10,11 +10,11 @@ AlternateFutures is a decentralized cloud platform (forked from Fleek) providing
 
 | Directory | Package Name | Purpose |
 |-----------|--------------|--------|
-| `service-cloud-api/` | `@alternatefutures/backend` | GraphQL API server (GraphQL Yoga + Prisma + PostgreSQL) |
-| `service-auth/` | `@alternatefutures/auth-service` | Authentication service (Hono + SQLite) |
-| `web-app.alternatefutures.ai/` | `@alternatefutures/app` | Main dashboard (SvelteKit 2 + Svelte 5) |
-| `package-cloud-cli/` | `@alternatefutures/cli` | CLI tool (Commander.js) |
-| `package-cloud-sdk/` | `@alternatefutures/sdk` | JavaScript SDK |
+| `alternate-clouds-api/` | `@alternatefutures/backend` | GraphQL API server (GraphQL Yoga + Prisma + PostgreSQL) |
+| `alternate-clouds-auth/` | `@alternatefutures/auth-service` | Authentication service (Hono + SQLite) |
+| `alternate-clouds-web-app/` | `@alternatefutures/app` | Main dashboard (SvelteKit 2 + Svelte 5) |
+| `alternate-clouds-cli/` | `@alternatefutures/cli` | CLI tool (Commander.js) |
+| `alternate-clouds-sdk/` | `@alternatefutures/sdk` | JavaScript SDK |
 | `web-docs.alternatefutures.ai/` | - | Documentation site |
 | `adapter-cloud-next/` | - | Next.js adapter for AF hosting |
 | `template-cloud-*` | - | Starter templates (Astro, Next.js, React, Vue, Hugo) |
@@ -24,9 +24,9 @@ AlternateFutures is a decentralized cloud platform (forked from Fleek) providing
 
 ## Common Commands by Project
 
-### Backend API (`service-cloud-api/`)
+### Backend API (`alternate-clouds-api/`)
 ```bash
-cd service-cloud-api
+cd alternate-clouds-api
 pnpm dev              # Start dev server (tsx watch)
 pnpm test             # Run tests (vitest)
 pnpm db:generate      # Generate Prisma client
@@ -36,26 +36,26 @@ pnpm lint             # ESLint
 pnpm format           # Prettier
 ```
 
-### Auth Service (`service-auth/`)
+### Auth Service (`alternate-clouds-auth/`)
 ```bash
-cd service-auth
+cd alternate-clouds-auth
 pnpm dev              # Start dev server
 pnpm test             # Run tests
 pnpm db:setup         # Initialize SQLite database
 ```
 
-### Web App (`web-app.alternatefutures.ai/`)
+### Web App (`alternate-clouds-web-app/`)
 ```bash
-cd web-app.alternatefutures.ai
+cd alternate-clouds-web-app
 pnpm dev              # Start Vite dev server
 pnpm build            # Production build
 pnpm check            # Svelte type checking
 pnpm test             # Run tests
 ```
 
-### CLI (`package-cloud-cli/`)
+### CLI (`alternate-clouds-cli/`)
 ```bash
-cd package-cloud-cli
+cd alternate-clouds-cli
 pnpm build            # Build CLI (transpile + bundle)
 pnpm test             # Run tests
 pnpm lint             # Biome linter
@@ -63,9 +63,9 @@ pnpm format           # Biome formatter
 ```
 The CLI binary is `af` (e.g., `af deploy`, `af sites list`).
 
-### SDK (`package-cloud-sdk/`)
+### SDK (`alternate-clouds-sdk/`)
 ```bash
-cd package-cloud-sdk
+cd alternate-clouds-sdk
 pnpm build            # Build for browser and Node
 pnpm test             # Run tests
 ```
@@ -85,7 +85,7 @@ pnpm test             # Run tests
 - **State**: Svelte stores in `src/lib/stores/`
 
 ### Authentication Flow
-The auth service (`service-auth/`) supports:
+The auth service (`alternate-clouds-auth/`) supports:
 1. Email magic links (passwordless)
 2. SMS OTP
 3. Web3 wallets (SIWE with MetaMask, WalletConnect, Phantom)
@@ -95,10 +95,10 @@ The auth service (`service-auth/`) supports:
 ## Key Files
 
 ### Database Schema
-- `service-cloud-api/prisma/schema.prisma` - Main Prisma schema with all models
+- `alternate-clouds-api/prisma/schema.prisma` - Main Prisma schema with all models
 
 ### GraphQL
-- `service-cloud-api/src/schema/` - GraphQL type definitions and resolvers
+- `alternate-clouds-api/src/schema/` - GraphQL type definitions and resolvers
 
 ### Environment
 Each project has its own `.env` file. Key variables:
