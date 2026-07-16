@@ -29,8 +29,12 @@ jobs:
     uses: alternatefutures/.github/.github/workflows/test.yml@main
     with:
       node-version: "20"
-      pnpm-version: "10"
 ```
+
+Do NOT pass `pnpm-version` if the repo's `package.json` has a `packageManager`
+field (it should) — `pnpm/action-setup` hard-fails when both are set. The
+reusable workflow picks up the `packageManager` version automatically; only
+pass `pnpm-version` for repos without the field.
 
 Repos needing service containers (e.g. `service-cloud-api`) run tests inline but MUST still produce `coverage/coverage-summary.json`.
 

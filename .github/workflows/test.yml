@@ -8,9 +8,9 @@ on:
         type: string
         default: "20"
       pnpm-version:
-        description: "pnpm version"
+        description: "pnpm version (leave empty to use the repo's package.json packageManager field)"
         type: string
-        default: "9"
+        default: ""
       build-before-test:
         description: "Run pnpm build before tests"
         type: boolean
@@ -39,7 +39,17 @@ jobs:
         with:
           node-version: ${{ inputs.node-version }}
 
-      - name: Install pnpm
+      # pnpm/action-setup hard-fails when `version` is passed AND the repo's
+      # package.json pins `packageManager` ("Multiple versions of pnpm
+      # specified"). Only pass `version` when the caller explicitly set one.
+      - name: Install pnpm (version from package.json packageManager)
+        if: ${{ inputs.pnpm-version == '' }}
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Install pnpm (version pinned by caller)
+        if: ${{ inputs.pnpm-version != '' }}
         uses: pnpm/action-setup@v4
         with:
           version: ${{ inputs.pnpm-version }}
