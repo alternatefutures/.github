@@ -58,8 +58,15 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Configure npm registry
-        if: ${{ secrets.NPM_TOKEN != '' }}
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+        # secrets.* is not a valid named-value in step `if` expressions of a
+        # called workflow — guard in bash instead
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        shell: bash
+        run: |
+          if [ -n "$NPM_TOKEN" ]; then
+            echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+          fi
 
       - name: Install dependencies
         run: pnpm install
