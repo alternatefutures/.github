@@ -58,6 +58,16 @@ CLI, SDK, GraphQL API, and a dashboard. Pick your workflow.
 
 ---
 
+## 🔎 AnswerReady
+
+Free deterministic tools for checking AI-search readiness, plus a $149 one-time Fix Pack that turns five existing revenue pages into publish-ready answer blocks, page-specific structured data, evidence requirements, and a prioritized action map.
+
+[Check a homepage or review the Fix Pack →](https://answerready.alternatefutures.ai/?utm_source=github&utm_medium=referral&utm_campaign=alternate-futures-org-profile)
+
+AnswerReady does not promise rankings, citations, or third-party AI visibility. Approved implementation and recurring hosting can be scoped separately on Alternate Clouds.
+
+---
+
 ## Open Source Repositories
 
 ### Services
