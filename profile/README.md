@@ -60,7 +60,7 @@ CLI, SDK, GraphQL API, and a dashboard. Pick your workflow.
 
 ## 🔎 AnswerReady
 
-Free deterministic tools for checking AI-search readiness, plus a $149 one-time Fix Pack that turns five existing revenue pages into publish-ready answer blocks, page-specific structured data, evidence requirements, and a prioritized action map.
+Free deterministic tools for checking AI-search readiness, plus a $69 one-time Fix Pack that turns five existing revenue pages into publish-ready answer blocks, page-specific structured data, evidence requirements, and a prioritized action map.
 
 [Check a homepage or review the Fix Pack →](https://answerready.alternatefutures.ai/?utm_source=github&utm_medium=referral&utm_campaign=alternate-futures-org-profile)
 
